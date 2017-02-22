@@ -85,4 +85,19 @@
         android:layout_below="@id/btnLogin"
         android:background="@android:drawable/bottom_bar">
     </Button>
+
+    <Button
+        android:id="@+id/btnGuest"
+        android:layout_width="260dp"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:text="Continue as Guest"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:background="@android:drawable/bottom_bar"
+        android:layout_marginTop="21dp"
+        android:layout_below="@+id/btnCreate"
+        android:layout_alignStart="@+id/welcome">
+    </Button>
+
 </RelativeLayout>
