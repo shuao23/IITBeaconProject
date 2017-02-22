@@ -34,6 +34,7 @@
             android:layout_marginTop="4dp"
             android:background="#aaa" >
         </View>
+
         <EditText
             android:id="@+id/createPassword"
             android:layout_width="250dp"
@@ -43,9 +44,8 @@
             android:background="#FFFFFF"
             android:drawablePadding="10dp"
             android:hint="Your password"
-            android:textColor="#3D3D3D"
             android:textColorHint="#A3B1CA"
-            android:textSize="15sp" >
+            android:inputType="textPassword">
         </EditText>
         <View
             android:layout_width="match_parent"
@@ -64,7 +64,8 @@
             android:hint="Enter your password again"
             android:textColor="#3D3D3D"
             android:textColorHint="#A3B1CA"
-            android:textSize="15sp" >
+            android:textSize="15sp"
+            android:inputType="textPassword">
         </EditText>
         <View
             android:layout_width="280dp"
@@ -123,12 +124,6 @@
                 android:id="@+id/radioButton2"
                 android:layout_weight="1" />
 
-            <RadioButton
-                android:text="Visitor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/radioButton"
-                android:layout_weight="1" />
         </RadioGroup>
     </LinearLayout>
     <Button
