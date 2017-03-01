@@ -1,11 +1,15 @@
 package ipro239.iitbeaconproject;
 
+import android.Manifest;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import com.qozix.tileview.TileView;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +24,8 @@ import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.logging.LogManager;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 
+import java.security.Permission;
+
 public class MapActivity extends AppCompatActivity implements BeaconConsumer, MonitorNotifier {
 
     private static final int PERMISSION_REQUEST_BLE = 376;
@@ -27,16 +33,18 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer, Mo
 
     private BackgroundPowerSaver powerSaver;
     private BeaconManager beaconManager;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FragmentTransaction fragTrans = getFragmentManager().beginTransaction();
-        MapFragment mapFragment = new MapFragment();
+        mapFragment = new MapFragment();
         fragTrans.add(R.id.map_fragment, mapFragment);
         fragTrans.commit();
         setContentView(R.layout.activity_map);
+
 
         //Beacon Setup
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -59,12 +67,12 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer, Mo
 
     @Override
     public void didEnterRegion(Region region) {
-        Toast.makeText(this, region.getId2() + " Entered", Toast.LENGTH_LONG).show();
+        mapFragment.TurnOnTestBeacon();
     }
 
     @Override
     public void didExitRegion(Region region) {
-        Toast.makeText(this, region.getId2() + " Exited", Toast.LENGTH_LONG).show();
+        mapFragment.TurnOffTestBeacon();
     }
 
     @Override
