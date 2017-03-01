@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import static ipro239.iitbeaconproject.R.id.btnGuest;
+
 public class TheBeaconApp extends AppCompatActivity {
-    private Button btnLogin,btnCreate;
+    private Button btnLogin,btnCreate, btnGuest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,11 +17,28 @@ public class TheBeaconApp extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnCreate = (Button) findViewById(R.id.btnCreate);
+        btnGuest = (Button) findViewById(R.id.btnGuest);
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(TheBeaconApp.this,CreateAccount.class));
             }
         });
+
+        btnGuest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TheBeaconApp.this,MapActivity.class));
+            }
+        });
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TheBeaconApp.this,MapActivity.class));
+            }
+        });
+
+
     }
 }
