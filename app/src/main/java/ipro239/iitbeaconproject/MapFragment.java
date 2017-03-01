@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.qozix.tileview.TileView;
 import com.qozix.tileview.widgets.ZoomPanLayout;
@@ -54,6 +55,7 @@ public class MapFragment extends Fragment {
             @Override
             public void run() {
                 testMarker.setImageResource(R.mipmap.ic_b_active);
+                Toast.makeText(getActivity(), "Its On", Toast.LENGTH_LONG).show();
             }
         });
 

@@ -28,9 +28,6 @@ import java.security.Permission;
 
 public class MapActivity extends AppCompatActivity implements BeaconConsumer, MonitorNotifier {
 
-    private static final int PERMISSION_REQUEST_BLE = 376;
-    private static final int PERMISSION_REQUEST_LOCATION = 913;
-
     private BackgroundPowerSaver powerSaver;
     private BeaconManager beaconManager;
     private MapFragment mapFragment;
@@ -49,6 +46,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer, Mo
         //Beacon Setup
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
+        beaconManager.setRegionExitPeriod(3000);
         beaconManager.bind(this);
     }
 
