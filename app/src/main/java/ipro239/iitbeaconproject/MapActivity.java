@@ -1,29 +1,80 @@
 package ipro239.iitbeaconproject;
 
+import android.Manifest;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import com.qozix.tileview.TileView;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
-public class MapActivity extends AppCompatActivity {
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.MonitorNotifier;
+import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.logging.LogManager;
+import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
+
+import java.security.Permission;
+
+public class MapActivity extends AppCompatActivity implements BeaconConsumer, MonitorNotifier {
+
+    private BackgroundPowerSaver powerSaver;
+    private BeaconManager beaconManager;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TileView tileView = new TileView(this);
-        tileView.setSize(6823,13866);
-        tileView.addDetailLevel(1f, "map_org_sliced/map_org_tile-%d_%d.png", 256, 256);
-        tileView.addDetailLevel(0.69998534369f, "map_70_sliced/map70_tile-%d_%d.png", 256, 256);
-        tileView.addDetailLevel(0.39997068738f, "map_40_sliced/map40_tile-%d_%d.png", 256, 256);
-        tileView.addDetailLevel(0.0999560311f, "map_10_sliced/map10_tile-%d_%d.png", 256, 256);
+        FragmentTransaction fragTrans = getFragmentManager().beginTransaction();
+        mapFragment = new MapFragment();
+        fragTrans.add(R.id.map_fragment, mapFragment);
+        fragTrans.commit();
+        setContentView(R.layout.activity_map);
 
-        ImageView downSample = new ImageView( this );
-        downSample.setImageResource( R.drawable.map_tiny );
-        tileView.addView( downSample, 0 );
 
-        setContentView(tileView);
+        //Beacon Setup
+        beaconManager = BeaconManager.getInstanceForApplication(this);
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
+        beaconManager.setRegionExitPeriod(3000);
+        beaconManager.bind(this);
     }
 
+    @Override
+    public void onBeaconServiceConnect() {
+        Identifier uuid = Identifier.parse(getResources().getString(R.string.eddystone_namespace));
+        Region testRegion = new Region("test_region", null, null, null);
+        beaconManager.addMonitorNotifier(this);
+        try{
+            beaconManager.startMonitoringBeaconsInRegion(testRegion);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+        powerSaver = new BackgroundPowerSaver(this);
+    }
+
+    @Override
+    public void didEnterRegion(Region region) {
+        mapFragment.TurnOnTestBeacon();
+    }
+
+    @Override
+    public void didExitRegion(Region region) {
+        mapFragment.TurnOffTestBeacon();
+    }
+
+    @Override
+    public void didDetermineStateForRegion(int i, Region region) {
+
+    }
 }
