@@ -66,6 +66,7 @@ public class MapFragment extends Fragment {
             @Override
             public void run() {
                 testMarker.setImageResource(R.mipmap.ic_b_inactive);
+                Toast.makeText(getActivity(), "Its Off", Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">IIT Beacon Project</string>
-    <string name="eddystone_namespace">0x2F234454F4911BA9FFA6</string>
+    <string name="eddystone_namespace">0xBBC766B6681D829D580D</string>
 </resources>
