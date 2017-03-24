@@ -38,7 +38,6 @@
             android:name=".MapActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-        <service android:name=".BLEScanService" />
     </application>
 
 </manifest>
