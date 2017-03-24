@@ -3,14 +3,20 @@ package ipro239.iitbeaconproject;
 import android.Manifest;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.util.Log;
 import android.widget.ImageView;
 import com.qozix.tileview.TileView;
@@ -27,14 +33,18 @@ import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.logging.LogManager;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
+import org.altbeacon.beacon.startup.BootstrapNotifier;
+import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.security.Permission;
 
-public class MapActivity extends AppCompatActivity implements BeaconConsumer {
+public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     private BackgroundPowerSaver powerSaver;
     private BeaconManager beaconManager;
     private MapFragment mapFragment;
+    private static final int NOTIFICATION_ID = 1;
+    private RegionBootstrap regionBootstrap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,35 +69,47 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.unbind(this);
+        //beaconManager.unbind(this);
     }
 
     @Override
     public void onBeaconServiceConnect() {
         Identifier uuid = Identifier.parse(getResources().getString(R.string.eddystone_namespace));
         Region testRegion = new Region("test_region", null, null, null);
-        beaconManager.addMonitorNotifier(new MonitorNotifier(){
-        @Override
-        public void didEnterRegion(Region region) {
-            mapFragment.TurnOnTestBeacon();
-        }
+        beaconManager.addMonitorNotifier(new MonitorNotifier() {
+            @Override
+            public void didEnterRegion(Region region) {
+                mapFragment.TurnOnTestBeacon();
+                Uri webpage=Uri.parse("http://www.google.com");
+                Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
+                //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+                        intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(getApplicationContext())
+                                .setSmallIcon(R.drawable.ic_b_active)
+                                .setContentTitle("IIT Beacon")
+                                .setContentText("Find beacon nearby")
+                                .setContentIntent(pi);
 
-        @Override
-        public void didExitRegion(Region region) {
-            mapFragment.TurnOffTestBeacon();
-        }
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            }
 
-        @Override
-        public void didDetermineStateForRegion(int i, Region region) {
+            @Override
+            public void didExitRegion(Region region) {
+                mapFragment.TurnOffTestBeacon();
+            }
 
-        }
+            @Override
+            public void didDetermineStateForRegion(int i, Region region) {
+            }
         });
-        try{
-            beaconManager.startMonitoringBeaconsInRegion(testRegion);
-        }catch (RemoteException e){
-            e.printStackTrace();
+        try {
+            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
         }
-        powerSaver = new BackgroundPowerSaver(this);
+        catch (RemoteException e) {    }
     }
     private boolean havePermissions() {
         return ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
