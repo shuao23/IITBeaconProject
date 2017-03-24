@@ -18,9 +18,13 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 import com.qozix.tileview.TileView;
+import com.qozix.tileview.widgets.ZoomPanLayout;
+
 import android.support.v7.app.AppCompatActivity;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.altbeacon.beacon.BeaconConsumer;
@@ -40,21 +44,17 @@ import java.security.Permission;
 
 public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
-    private BackgroundPowerSaver powerSaver;
+    //Statics
+    private static final int NOTIFICATION_ID = 691;
+    private static final int PERMISSION_REQUEST = 786;
+
     private BeaconManager beaconManager;
-    private MapFragment mapFragment;
-    private static final int NOTIFICATION_ID = 1;
-    private RegionBootstrap regionBootstrap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentTransaction fragTrans = getFragmentManager().beginTransaction();
-        mapFragment = new MapFragment();
-        fragTrans.add(R.id.map_fragment, mapFragment);
-        fragTrans.commit();
-        setContentView(R.layout.activity_map);
+        setContentView(setupMap());
 
         if (!havePermissions()) {
             requestPermissions();
@@ -79,7 +79,6 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
-                mapFragment.TurnOnTestBeacon();
                 Uri webpage=Uri.parse("http://www.google.com");
                 Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
                 //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
@@ -99,7 +98,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
             @Override
             public void didExitRegion(Region region) {
-                mapFragment.TurnOffTestBeacon();
+
             }
 
             @Override
@@ -111,12 +110,33 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         }
         catch (RemoteException e) {    }
     }
+
     private boolean havePermissions() {
         return ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
     }
+
     private void requestPermissions() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1111);
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},PERMISSION_REQUEST);
     }
+
+    private TileView setupMap(){
+        TileView tileView = new TileView(this);
+        tileView.setSize(6823,13866);
+        tileView.addDetailLevel(1f, "map_org_sliced/map_org_tile-%d_%d.png", 256, 256);
+        tileView.addDetailLevel(0.69998534369f, "map_70_sliced/map70_tile-%d_%d.png", 256, 256);
+        tileView.addDetailLevel(0.39997068738f, "map_40_sliced/map40_tile-%d_%d.png", 256, 256);
+        tileView.addDetailLevel(0.0999560311f, "map_10_sliced/map10_tile-%d_%d.png", 256, 256);
+
+        ImageView downSample = new ImageView(this);
+        downSample.setImageResource( R.drawable.map_tiny );
+        tileView.addView( downSample, 0 );
+
+        tileView.setScale(0);
+        tileView.setMinimumScaleMode(ZoomPanLayout.MinimumScaleMode.FIT);
+
+        return tileView;
+    }
+
 }

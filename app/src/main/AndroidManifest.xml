@@ -25,18 +25,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:launchMode="singleInstance"
-            android:name=".TheBeaconApp">
+            android:name=".TheBeaconApp"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateAccount" />
+
+        <activity android:name=".CreateAccount"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".MapActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:screenOrientation="portrait" />
 
     </application>
 

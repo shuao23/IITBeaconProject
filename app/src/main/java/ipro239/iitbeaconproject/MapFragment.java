@@ -2,8 +2,11 @@ package ipro239.iitbeaconproject;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,7 +14,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.qozix.tileview.TileView;
+import com.qozix.tileview.tiles.Tile;
 import com.qozix.tileview.widgets.ZoomPanLayout;
+
+import java.sql.Time;
+import java.util.UUID;
 
 /**
  * Created by shuao23 on 3/1/2017.
@@ -70,4 +77,6 @@ public class MapFragment extends Fragment {
             }
         });
     }
+
+
 }

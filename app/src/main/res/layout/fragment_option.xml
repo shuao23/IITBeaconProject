@@ -14,101 +14,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:background="@android:color/darker_gray"
             android:orientation="vertical">
 
             <Switch
                 android:id="@+id/ui_notification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:attr/windowBackground"
-                android:padding="10dp"
+                android:padding="15dp"
                 android:text="@string/option_notifications"
                 android:textSize="18sp" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="1dp" />
 
             <Switch
                 android:id="@+id/ui_background"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:attr/windowBackground"
-                android:padding="10dp"
+                android:padding="15dp"
                 android:text="@string/option_background"
                 android:textSize="18sp" />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="1dp" />
 
             <TextView
                 android:id="@+id/ui_user_mode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:attr/windowBackground"
-                android:padding="10dp"
-                android:text="@string/option_usermode"
+                android:padding="15dp"
+                android:text="@string/option_change_usermode"
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
-
-            <RadioGroup
-                android:id="@+id/ui_usermode_grp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?android:attr/windowBackground">
-
-                <RadioButton
-                    android:id="@+id/ui_student_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:padding="10dp"
-                    android:text="@string/option_student"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/ui_faculty_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_weight="1"
-                    android:padding="10dp"
-                    android:text="@string/option_faculty"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/ui_guest_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_weight="1"
-                    android:padding="10dp"
-                    android:text="@string/option_guest"
-                    android:textSize="18sp" />
-
-                <RadioButton
-                    android:id="@+id/ui_customuser_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_weight="1"
-                    android:padding="10dp"
-                    android:text="@string/option_custom"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="10dp"
-                    android:text="@string/option_custom_settings"
-                    android:textAlignment="textEnd"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="18sp" />
-            </RadioGroup>
 
         </LinearLayout>
     </ScrollView>
