@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_rescan"
-        android:icon="@drawable/renew_24dp"
+        android:icon="@drawable/ic_renew_24dp"
         android:title="@string/menu_rescan"
         app:showAsAction="ifRoom" />
 
