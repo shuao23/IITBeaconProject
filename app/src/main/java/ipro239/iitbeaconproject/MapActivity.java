@@ -9,19 +9,21 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.RemoteException;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -46,17 +48,17 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
 
-import java.util.Dictionary;
-import java.util.List;
-
 public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     //Statics
     private static final int NOTIFICATION_ID = 691;
-    private static final int PERMISSION_REQUEST = 786;
+    private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
+    private static final int REQUEST_ENABLE_LOC = 555;
     private static final int SCAN_LENGTH = 5000;
 
+    private TileView mapView;
+    private View uiView;
     private Menu optionMenu;
     private BeaconManager beaconManager;
 
@@ -69,7 +71,8 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
     private BluetoothAdapter.LeScanCallback old_leScanCallback;
 
     //For beacons
-    Dictionary<String, Beacon> connectedBeacons;
+    BeaconConnectionManager connectionManager = new BeaconConnectionManager();
+    BeaconDisplayer beaconDisplayer;
 
 
     @Override
@@ -77,17 +80,10 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         super.onCreate(savedInstanceState);
 
         setupView();
+        askForAllPermissions();
+        beaconDisplayer = new BeaconDisplayer(this, mapView);
 
-
-        if (!haveLocPermissions()) {
-            requestLocPermissions();
-        }
-
-        turnBluetoothOn();
-        if(!isBluetoothOn())
-            requestBluetooth();
-
-        //Beacon Setup
+        //BeaconDisplay Setup
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
         beaconManager.setRegionExitPeriod(3000);
@@ -114,12 +110,6 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //beaconManager.unbind(this);
-    }
-
-    @Override
     public void onBeaconServiceConnect() {
         Identifier uuid = Identifier.parse("");
         Region testRegion = new Region("test_region", null, null, null);
@@ -134,7 +124,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(getApplicationContext())
                                 .setSmallIcon(R.drawable.ic_b_active)
-                                .setContentTitle("IIT Beacon")
+                                .setContentTitle("IIT BeaconDisplay")
                                 .setContentText("Find beacon nearby")
                                 .setContentIntent(pi);
 
@@ -158,6 +148,42 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         catch (RemoteException e) {    }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == REQUEST_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            askForAllPermissions();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_ENABLE_LOC) {
+            askForAllPermissions();
+        }else if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK)
+            turnBluetoothOn();
+    }
+
+    private boolean askForAllPermissions(){
+        if(!haveLocPermissions()) {
+            requestLocPermissions();
+            return false;
+        }
+        if(!isLocOn()){
+            turnLocOn();
+            return false;
+        }
+
+        if(!haveBLEPermissions()){
+            requestBLEPermissions();
+            return false;
+        }
+        if(!isBluetoothOn()) {
+            requestBluetooth();
+            return false;
+        }
+
+        return true;
+    }
+
     private boolean haveLocPermissions() {
         return ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
@@ -165,7 +191,38 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     private void requestLocPermissions() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},PERMISSION_REQUEST);
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION);
+    }
+
+    private boolean isLocOn(){
+        LocationManager locationManager = null;
+        boolean gps_enabled= false, network_enabled = false;
+
+        if(locationManager ==null)
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try{
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }catch(Exception ex){}
+
+        try{
+            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        }catch(Exception ex){}
+
+        return gps_enabled || network_enabled;
+    }
+
+    private void turnLocOn(){
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setMessage(R.string.dialog_loc_msg);
+        alertBuilder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent locIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivityForResult(locIntent, REQUEST_ENABLE_LOC);
+            }
+        });
+        alertBuilder.setNegativeButton(R.string.dialog_no, null);
+        alertBuilder.show();
     }
 
     private boolean haveBLEPermissions(){
@@ -175,7 +232,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     private void requestBLEPermissions() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.BLUETOOTH_ADMIN},PERMISSION_REQUEST);
+                new String[]{Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_PERMISSION);
     }
 
     private void turnBluetoothOn(){
@@ -207,7 +264,10 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
                 @Override
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 public void onScanResult(int callbackType, ScanResult result) {
-                    debugBeacons("ScanResult: ", result.getScanRecord().getBytes());
+                    IITBeaconParser parser = new IITBeaconParser(result.getScanRecord().getBytes());
+                    if(parser.validBeacon() && result.getRssi() >= parser.getTxPower())
+                        debugBeacons("TX Power: " + String.valueOf(parser.getTxPower()) + "ID, ",
+                                parser.getInstanceID());
                 }
 
                 //IDK what this is but never gets called
@@ -243,7 +303,10 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
              old_leScanCallback = new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    debugBeacons("old: ", scanRecord);
+                    IITBeaconParser parser = new IITBeaconParser(scanRecord);
+                    if(parser.validBeacon() && rssi >= parser.getTxPower())
+                        debugBeacons("TX Power: " + String.valueOf(parser.getTxPower()) + "ID, ",
+                                parser.getInstanceID());
                 }
             };
         }
@@ -264,9 +327,11 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         //Create the map view
         TileView tileView = createMap();
         baseLayout.addView(tileView);
+        mapView = tileView;
         //Create the UI view
-        View uiView = getLayoutInflater().inflate(R.layout.mapui_layout, null);
-        baseLayout.addView(uiView);
+        View uiview = getLayoutInflater().inflate(R.layout.mapui_layout, null);
+        baseLayout.addView(uiview);
+        uiView = uiview;
         //Display the base view
         setContentView(baseLayout);
     }
@@ -310,15 +375,8 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startScan(){
-        if(!haveBLEPermissions()) {
-            requestBLEPermissions();
+        if(!askForAllPermissions())
             return;
-        }
-
-        if(!isBluetoothOn()) {
-            requestBluetooth();
-            return;
-        }
 
         if(!isBLECallbackInit())
             initBLECallback();
@@ -346,5 +404,11 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
             bluetoothAdapter.stopLeScan(old_leScanCallback);
         else
             bleScanner.stopScan(leScanCallback);
+        connectionManager.checkConnections();
+        displayChanges();
+    }
+
+    private void displayChanges(){
+
     }
 }
