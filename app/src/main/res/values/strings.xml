@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">IIT Beacon Project</string>
-    <string name="eddystone_namespace">0xBBC766B6681D829D580D</string>
-
-
     <string name="option_notifications">Notifications</string>
     <string name="option_background">Background Scanning</string>
     <string name="option_change_usermode">Change User Mode</string>

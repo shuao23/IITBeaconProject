@@ -121,7 +121,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     @Override
     public void onBeaconServiceConnect() {
-        Identifier uuid = Identifier.parse(getResources().getString(R.string.eddystone_namespace));
+        Identifier uuid = Identifier.parse("");
         Region testRegion = new Region("test_region", null, null, null);
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
