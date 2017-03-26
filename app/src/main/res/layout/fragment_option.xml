@@ -1,47 +1,53 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ipro239.iitbeaconproject.OptionFragment"
-    android:orientation="vertical">
+    android:layout_marginTop="10dp"
+    android:orientation="vertical"
+    tools:context="ipro239.iitbeaconproject.OptionFragment">
 
 
-    <ScrollView
+    <TextView
+        android:id="@+id/ui_user_mode"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:padding="15dp"
+        android:text="@string/option_change_usermode"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:orientation="vertical">
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
 
-            <Switch
-                android:id="@+id/ui_notification"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/option_notifications"
-                android:textSize="18sp" />
+    <Switch
+        android:id="@+id/ui_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:padding="15dp"
+        android:text="@string/option_notifications"
+        android:textSize="18sp" />
 
-            <Switch
-                android:id="@+id/ui_background"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/option_background"
-                android:textSize="18sp" />
+    <View
+        android:id="@+id/view4"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
 
-            <TextView
-                android:id="@+id/ui_user_mode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:text="@string/option_change_usermode"
-                android:textColor="@android:color/black"
-                android:textSize="18sp" />
+    <Switch
+        android:id="@+id/ui_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:padding="15dp"
+        android:text="@string/option_background"
+        android:textSize="18sp" />
 
-        </LinearLayout>
-    </ScrollView>
-
-</FrameLayout>
+</LinearLayout>

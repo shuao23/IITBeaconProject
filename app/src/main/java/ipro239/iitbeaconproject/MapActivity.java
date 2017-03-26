@@ -55,19 +55,19 @@ import java.security.cert.TrustAnchor;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
+public class MapActivity extends AppCompatActivity  {
 
     //Statics
     private static final int NOTIFICATION_ID = 691;
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
-    private static final int SCAN_LENGTH = 3000;
+    private static final int SCAN_LENGTH = 2500;
+    private static final int MARKER_UPDATE_WAIT = 500;
 
     private TileView mapView;
     private View uiView;
     private Menu optionMenu;
-    private BeaconManager beaconManager;
 
     //For bluetooth
     private BluetoothAdapter bluetoothAdapter;
@@ -80,6 +80,14 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
     //For beacons
     BeaconConnectionManager connectionManager = new BeaconConnectionManager();
     BeaconDisplayer beaconDisplayer;
+    Handler markerUpdateHandler = new Handler();
+    Runnable markerUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            displayChanges();
+            markerUpdateHandler.postDelayed(markerUpdateRunnable,MARKER_UPDATE_WAIT);
+        }
+    };
 
 
     @Override
@@ -97,13 +105,6 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         }
 
         beaconDisplayer.updateDisplay();
-
-
-        //BeaconDisplay Setup
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
-        beaconManager.setRegionExitPeriod(3000);
-        beaconManager.bind(this);
     }
 
     @Override
@@ -125,7 +126,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         return true;
     }
 
-    @Override
+    /*@Override
     public void onBeaconServiceConnect() {
         Identifier uuid = Identifier.parse("");
         Region testRegion = new Region("test_region", null, null, null);
@@ -162,7 +163,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
             beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
         }
         catch (RemoteException e) {    }
-    }
+    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -403,6 +404,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
         else{
             bleScanner.startScan(leScanCallback);
         }
+        markerUpdateHandler.postDelayed(markerUpdateRunnable,MARKER_UPDATE_WAIT);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -413,6 +415,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
             bluetoothAdapter.stopLeScan(old_leScanCallback);
         else
             bleScanner.stopScan(leScanCallback);
+        markerUpdateHandler.removeCallbacks(markerUpdateRunnable);
         connectionManager.checkConnections();
         displayChanges();
     }
