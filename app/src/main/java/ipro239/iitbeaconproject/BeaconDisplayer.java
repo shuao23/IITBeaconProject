@@ -1,6 +1,7 @@
 package ipro239.iitbeaconproject;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.ViewManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -16,10 +17,10 @@ import java.util.Iterator;
 
 public class BeaconDisplayer {
 
-    private BeaconDisplay.Tag displayTag;
+    private int displayTag = BeaconDisplay.TAG_ALL;
     private Activity activity;
     private TileView tileView;
-    private HashMap<byte[],BeaconDisplay> beacons;
+    private HashMap<String,BeaconDisplay> beacons = new HashMap<>();
 
     public BeaconDisplayer(Activity activity, TileView tileView){
         this.activity = activity;
@@ -27,11 +28,28 @@ public class BeaconDisplayer {
     }
 
     public void updateDisplay(){
+        removeAllDisplayedBeacons();
+        Iterator<BeaconDisplay> it = beacons.values().iterator();
+        while (it.hasNext()){
+            BeaconDisplay beacon = it.next();
+            if(beacon.getTags() == 0 || (beacon.getTags() & displayTag) != 0){
+                createBeaconMarker(beacon);
+            }
+        }
+    }
+
+    public void changeBeaconState(String id, boolean isOn){
+        if(!beacons.containsKey(id))
+            return;
+
+        if(isOn)
+            beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_active);
+        else
+            beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_inactive);
 
     }
 
     public void addBeacon(BeaconDisplay beaconDisplay){
-        createBeaconMarker(beaconDisplay);
         beacons.put(beaconDisplay.getInstanceID(), beaconDisplay);
     }
 
@@ -41,28 +59,32 @@ public class BeaconDisplayer {
     }
 
     public void removeAllBeacons(){
-        Iterator<BeaconDisplay> itr = beacons.values().iterator();
-        while(itr.hasNext()){
-            BeaconDisplay beacon = itr.next();
-            removeBeaconMarker(beacon);
-        }
+        removeAllDisplayedBeacons();
         beacons.clear();
     }
 
-    public void setDisplayTag(BeaconDisplay.Tag displayTag) {
+    public void setDisplayTag(int displayTag) {
         this.displayTag = displayTag;
     }
 
-    public BeaconDisplay.Tag getDisplayTag() {
+    public int getDisplayTag() {
         return displayTag;
     }
 
-    public BeaconDisplay getBeacon(byte[] instanceID){
+    public BeaconDisplay getBeacon(String instanceID){
         return beacons.get(instanceID);
     }
 
     public int getBeaconCount(){
         return beacons.size();
+    }
+
+    private void removeAllDisplayedBeacons(){
+        Iterator<BeaconDisplay> itr = beacons.values().iterator();
+        while(itr.hasNext()){
+            BeaconDisplay beacon = itr.next();
+            removeBeaconMarker(beacon);
+        }
     }
 
     private void createBeaconMarker(BeaconDisplay beacon){

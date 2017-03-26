@@ -19,14 +19,14 @@ public class IITBeaconParser {
             0x58,0x0D};
     private static final int INSTANCE_ID_LENGTH = 6;
 
-    private byte[] instanceID;
+    private String instanceID;
     private int txPower;
 
     public IITBeaconParser(byte[] scanRecord){
         parse(scanRecord);
     }
 
-    public byte[] getInstanceID() {
+    public String getInstanceID() {
         return instanceID;
     }
 
@@ -53,10 +53,12 @@ public class IITBeaconParser {
                 return;
         }
 
-        instanceID = new byte[INSTANCE_ID_LENGTH];
+        StringBuilder sb = new StringBuilder();
         txPower = scanRecord[PDU.length];
-        for(int i = 0; i < instanceID.length; i++){
-            instanceID[i] = scanRecord[i + PDU.length + UUID.length + 1];
+        for(int i = 0; i < 6; i++){
+            int indexOff = PDU.length + UUID.length + 1;
+            sb.append(String.format("%02x", scanRecord[indexOff + i]));
         }
+        instanceID = sb.toString().toUpperCase();
     }
 }

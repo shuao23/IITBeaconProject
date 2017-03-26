@@ -1,5 +1,6 @@
 package ipro239.iitbeaconproject;
 
+import android.bluetooth.le.ScanFilter;
 import android.widget.ImageView;
 
 /**
@@ -8,27 +9,36 @@ import android.widget.ImageView;
 
 public class BeaconDisplay {
 
-    public enum Tag{
-        TAG1 (1<<0),
-        TAG2 (2<<0),
-        NONE (0),
-        EVERY (~0);
+    public static final int TAG1 = (1<<0);
+    public static final int TAG2 = (1<<1);
+    public static final int TAG3 = (1<<2);
+    public static final int TAG4 = (1<<3);
+    public static final int TAG5 = (1<<4);
+    public static final int TAG6 = (1<<5);
+    public static final int TAG7 = (1<<6);
+    public static final int TAG8 = (1<<7);
+    public static final int TAG9 = (1<<8);
+    public static final int TAG_NONE = 0;
+    public static final int TAG_ALL = ~0;
 
-        private final int value;
-        Tag(int value){
-            this.value = value;
-        }
-        public int getValue(){ return value; }
-    }
-
-    public class Builder{
-        private BeaconDisplay beaconDisplay;
+    public static class Builder{
+        private BeaconDisplay beaconDisplay = new BeaconDisplay();
 
         public BeaconDisplay build(){
             return beaconDisplay;
         }
 
-        public Builder setTags(Tag tags) {
+        public Builder setInstanceID(String id){
+            beaconDisplay.setInstanceID(id);
+            return this;
+        }
+
+        public Builder setName(String name){
+            beaconDisplay.setName(name);
+            return this;
+        }
+
+        public Builder setTags(int tags) {
             beaconDisplay.setTags(tags);
             return this;
         }
@@ -59,35 +69,24 @@ public class BeaconDisplay {
         }
     }
 
-    private byte[] instanceID;
+    private String instanceID;
     private String name;
-    private int txPower;
-    private Tag tags;
+    private int tags;
     private String description;
     private String url;
     private Coord location;
     private ImageView marker;
 
-    public BeaconDisplay(byte[] instanceID, String name, int txPower){
-        this.instanceID = instanceID;
-        this.name = name;
-        this.txPower = txPower;
-    }
-
-    public byte[] getInstanceID() {
+    public String getInstanceID() {
         return instanceID;
     }
 
-    public Tag getTags() {
+    public int getTags() {
         return tags;
     }
 
     public String getName() {
         return name;
-    }
-
-    public int getTxPower() {
-        return txPower;
     }
 
     public String getDescription() {
@@ -112,20 +111,16 @@ public class BeaconDisplay {
         return marker;
     }
 
-    public void setInstanceID(byte[] instanceID) {
+    public void setInstanceID(String instanceID) {
         this.instanceID = instanceID;
     }
 
-    public void setTags(Tag tags) {
+    public void setTags(int tags) {
         this.tags = tags;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setTxPower(int txPower) {
-        this.txPower = txPower;
     }
 
     public void setDescription(String description){

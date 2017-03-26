@@ -48,6 +48,13 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.cert.TrustAnchor;
+import java.util.HashMap;
+import java.util.List;
+
 public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
     //Statics
@@ -55,7 +62,7 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
-    private static final int SCAN_LENGTH = 5000;
+    private static final int SCAN_LENGTH = 3000;
 
     private TileView mapView;
     private View uiView;
@@ -81,7 +88,16 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
 
         setupView();
         askForAllPermissions();
-        beaconDisplayer = new BeaconDisplayer(this, mapView);
+        List<BeaconDisplay> beacons = getBeaconData();
+        if(beacons != null) {
+            beaconDisplayer = new BeaconDisplayer(this, mapView);
+            for(int i = 0; i < beacons.size(); i++){
+                beaconDisplayer.addBeacon(beacons.get(i));
+            }
+        }
+
+        beaconDisplayer.updateDisplay();
+
 
         //BeaconDisplay Setup
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -265,9 +281,10 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 public void onScanResult(int callbackType, ScanResult result) {
                     IITBeaconParser parser = new IITBeaconParser(result.getScanRecord().getBytes());
-                    if(parser.validBeacon() && result.getRssi() >= parser.getTxPower())
-                        debugBeacons("TX Power: " + String.valueOf(parser.getTxPower()) + "ID, ",
-                                parser.getInstanceID());
+                    if(parser.validBeacon() && result.getRssi() >= parser.getTxPower()) {
+                        connectionManager.connect(parser.getInstanceID());
+                        displayChanges();
+                    }
                 }
 
                 //IDK what this is but never gets called
@@ -304,21 +321,13 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
                 @Override
                 public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
                     IITBeaconParser parser = new IITBeaconParser(scanRecord);
-                    if(parser.validBeacon() && rssi >= parser.getTxPower())
-                        debugBeacons("TX Power: " + String.valueOf(parser.getTxPower()) + "ID, ",
-                                parser.getInstanceID());
+                    if(parser.validBeacon() && rssi >= parser.getTxPower()) {
+                        connectionManager.connect(parser.getInstanceID());
+                        displayChanges();
+                    }
                 }
             };
         }
-    }
-
-    private void debugBeacons(String pre, byte[] record){
-        StringBuilder sb = new StringBuilder();
-        sb.append(pre);
-        for(int i = 0; i < record.length; i++){
-            sb.append(String.format("%02X", record[i]));
-        }
-        Log.d("TEST", sb.toString());
     }
 
     private void setupView(){
@@ -409,6 +418,32 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
     }
 
     private void displayChanges(){
+        BeaconConnectionManager.BeaconConnection connection = connectionManager.popConnectionQueue();
+        while (connection != null) {
+            if (connection.status == BeaconConnectionManager.Status.CONNECTED)
+                beaconDisplayer.changeBeaconState(connection.id, true);
+            else
+                beaconDisplayer.changeBeaconState(connection.id, false);
+            connection = connectionManager.popConnectionQueue();
+        }
+    }
 
+    private List<BeaconDisplay> getBeaconData(){
+        //Display beacons
+        List<BeaconDisplay> result;
+        InputStream inputStream = getResources().openRawResource(R.raw.beacons);
+        BeaconXMLParser parser = new BeaconXMLParser();
+        try {
+            try {
+                result = parser.parse(inputStream);
+
+            }finally {
+                inputStream.close();
+            }
+        }catch (Exception e){
+            result = null;
+            Toast.makeText(this, "Could not load beacons", Toast.LENGTH_LONG).show();
+        }
+        return result;
     }
 }

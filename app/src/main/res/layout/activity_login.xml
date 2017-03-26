@@ -95,9 +95,9 @@
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:background="@android:drawable/bottom_bar"
-        android:layout_marginTop="21dp"
+        android:layout_marginTop="24dp"
         android:layout_below="@+id/btnCreate"
-        android:layout_alignStart="@+id/welcome">
+        android:layout_alignStart="@+id/btnCreate">
     </Button>
 
 </RelativeLayout>
