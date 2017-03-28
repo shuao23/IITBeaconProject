@@ -1,4 +1,23 @@
 <resources>
     <string name="app_name">IIT Beacon Project</string>
-    <string name="eddystone_namespace">0xBBC766B6681D829D580D</string>
+    <string name="option_notifications">Notifications</string>
+    <string name="option_background">Background Scanning</string>
+    <string name="option_change_usermode">Change User Mode</string>
+    <string name="option_student">Student</string>
+    <string name="option_faculty">Faculty</string>
+    <string name="option_guest">Guest</string>
+    <string name="option_custom">Custom</string>
+    <string name="option_custom_settings">Custom Mode</string>
+    <string name="menu_rescan">Rescan</string>
+    <string name="menu_options">Options</string>
+    <string name="dialog_ok">YES</string>
+    <string name="dialog_no">NO</string>
+    <string name="dialog_loc_msg">Application is requesting permission to turn on Location Services. Allow?</string>
+    <string name="option_filter">Filters</string>
+    <string name="filter1">Filter 1</string>
+    <string name="filter2">Filter 2</string>
+    <string name="filter3">Filter 3</string>
+    <string name="filter4">Filter 4</string>
+    <string name="filter5">Filter 5</string>
+    <string name="apply">Apply</string>
 </resources>

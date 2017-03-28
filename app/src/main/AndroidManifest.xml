@@ -11,12 +11,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-feature
-        android:name="android.hardware.bluetooth"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.location.gps"
-        android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" />
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -29,20 +25,32 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:launchMode="singleInstance"
-            android:name=".TheBeaconApp">
+            android:name=".TheBeaconApp"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".CreateAccount"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".MapActivity"
+            android:label="IIT Campus Map"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateAccount" />
-        <activity
-            android:name=".MapActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-        <service android:name=".BLEScanService" />
+        <activity
+            android:name=".OptionsActivity"
+            android:label="Options"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".UserModeActivity"
+            android:label="User Mode"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

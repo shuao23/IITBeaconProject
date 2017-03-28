@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beacons>
+    <beacon>
+        <id>00000000004D</id>
+        <name>Test Beacon</name>
+        <tags>0</tags>
+        <description>This is a test beacon</description>
+        <url>http://pop.weclarify.com/</url>
+        <location>
+            <x>1500</x>
+            <y>11177</y>
+        </location>
+    </beacon>
+    <beacon>
+        <id>00000000004E</id>
+        <name>Test Beacon</name>
+        <tags>0</tags>
+        <description>This is a test beacon</description>
+        <url>http://pop.weclarify.com/</url>
+        <location>
+            <x>2000</x>
+            <y>11000</y>
+        </location>
+    </beacon>
+    <beacon>
+        <id>00000000004F</id>
+        <name>Test Beacon</name>
+        <tags>0</tags>
+        <description>This is a test beacon</description>
+        <url>http://pop.weclarify.com/</url>
+        <location>
+            <x>3000</x>
+            <y>1000</y>
+        </location>
+    </beacon>
+
+    <!--Beacon Template-->
+    <!--
+    <beacon>
+        <id></id>
+        <name></name>
+        <tags></tags>
+        <description></description>
+        <url></url>
+        <location>
+            <x></x>
+            <y></y>
+        </location>
+    </beacon>
+    -->
+</beacons>
