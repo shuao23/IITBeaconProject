@@ -8,7 +8,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 /**
  * Created by shuao23 on 3/25/2017.
@@ -23,13 +26,23 @@ public class OptionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //Setup the back button
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.activity_option);
 
-        //Setup options
-        Fragment newFragment = new OptionFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        FrameLayout layout = new FrameLayout(this);
-        transaction.replace(layout.getId(), newFragment);
-        transaction.commit();
+        TextView text = (TextView)findViewById(R.id.ui_user_mode);
+        text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(OptionsActivity.this, UserModeActivity.class));
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

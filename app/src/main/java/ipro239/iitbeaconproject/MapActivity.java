@@ -2,8 +2,6 @@ package ipro239.iitbeaconproject;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -13,13 +11,10 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -27,8 +22,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,18 +35,7 @@ import android.widget.Toast;
 import com.qozix.tileview.TileView;
 import com.qozix.tileview.widgets.ZoomPanLayout;
 
-import org.altbeacon.beacon.BeaconConsumer;
-import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.Region;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.security.cert.TrustAnchor;
-import java.util.HashMap;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity  {
@@ -97,8 +79,8 @@ public class MapActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(!InitializeActivity.Initialized(this)){
-            startActivityForResult(new Intent(this, InitializeActivity.class),INIT_RESULT);
+        if(!UserModeActivity.Initialized(this)){
+            startActivityForResult(new Intent(this, UserModeActivity.class),INIT_RESULT);
         }else{
             onActivityResult(INIT_RESULT, 0, null);
         }
@@ -118,6 +100,7 @@ public class MapActivity extends AppCompatActivity  {
                 startScan();
                 break;
             case R.id.menu_options:
+                startActivity(new Intent(this, OptionsActivity.class));
                 break;
         }
         return true;

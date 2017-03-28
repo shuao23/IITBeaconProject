@@ -26,13 +26,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".TheBeaconApp"
-            android:screenOrientation="portrait"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="portrait"/>
 
         <activity android:name=".CreateAccount"
             android:screenOrientation="portrait"/>
@@ -40,17 +34,22 @@
         <activity
             android:name=".MapActivity"
             android:label="IIT Campus Map"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".InitializeActivity"
-            android:label="User Mode"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".OptionsActivity"
             android:label="Options"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".UserModeActivity"
+            android:label="User Mode"
+            android:screenOrientation="portrait"/>
 
     </application>
 
