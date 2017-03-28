@@ -13,6 +13,7 @@ import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -62,8 +63,10 @@ public class MapActivity extends AppCompatActivity  {
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
+    private static final int INIT_RESULT = 123;
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
+    private static final String BEACON_PREF_NAME = "BeaconOptions";
 
     private TileView mapView;
     private View uiView;
@@ -94,17 +97,11 @@ public class MapActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setupView();
-        askForAllPermissions();
-        List<BeaconDisplay> beacons = getBeaconData();
-        if(beacons != null) {
-            beaconDisplayer = new BeaconDisplayer(this, mapView);
-            for(int i = 0; i < beacons.size(); i++){
-                beaconDisplayer.addBeacon(beacons.get(i));
-            }
+        if(!InitializeActivity.Initialized(this)){
+            startActivityForResult(new Intent(this, InitializeActivity.class),INIT_RESULT);
+        }else{
+            onActivityResult(INIT_RESULT, 0, null);
         }
-
-        beaconDisplayer.updateDisplay();
     }
 
     @Override
@@ -175,8 +172,20 @@ public class MapActivity extends AppCompatActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_ENABLE_LOC) {
             askForAllPermissions();
-        }else if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK)
+        }else if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
             turnBluetoothOn();
+        }else if(requestCode == INIT_RESULT){
+            setupView();
+            askForAllPermissions();
+            List<BeaconDisplay> beacons = getBeaconData();
+            if(beacons != null) {
+                beaconDisplayer = new BeaconDisplayer(this, mapView);
+                for(int i = 0; i < beacons.size(); i++){
+                    beaconDisplayer.addBeacon(beacons.get(i));
+                }
+            }
+            beaconDisplayer.updateDisplay();
+        }
     }
 
     private boolean askForAllPermissions(){

@@ -42,6 +42,16 @@
             android:label="IIT Campus Map"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".InitializeActivity"
+            android:label="User Mode"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".OptionsActivity"
+            android:label="Options"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

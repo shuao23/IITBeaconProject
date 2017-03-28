@@ -14,4 +14,10 @@
     <string name="dialog_no">NO</string>
     <string name="dialog_loc_msg">Application is requesting permission to turn on Location Services. Allow?</string>
     <string name="option_filter">Filters</string>
+    <string name="filter1">Filter 1</string>
+    <string name="filter2">Filter 2</string>
+    <string name="filter3">Filter 3</string>
+    <string name="filter4">Filter 4</string>
+    <string name="filter5">Filter 5</string>
+    <string name="apply">Apply</string>
 </resources>

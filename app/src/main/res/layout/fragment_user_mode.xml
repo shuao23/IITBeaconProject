@@ -3,22 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="ipro239.iitbeaconproject.UserModeFragment"
+    android:padding="0dp">
 
     <!-- TODO: Update blank fragment layout -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp">
 
         <RadioGroup
             android:id="@+id/ui_usermode_grp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="15dp"
-            android:layout_marginStart="15dp">
+            android:layout_marginStart="15dp"
+            android:checkedButton="@+id/ui_student_button">
 
             <RadioButton
                 android:id="@+id/ui_student_button"
@@ -57,6 +61,27 @@
 
         </RadioGroup>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/user_mode_apply"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:text="@string/apply"
+                android:textColor="@android:color/background_light" />
+        </LinearLayout>
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -78,53 +103,59 @@
             android:textSize="18sp" />
 
         <Switch
-            android:id="@+id/switch1"
+            android:id="@+id/filter_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
+            android:enabled="false"
             android:padding="15dp"
-            android:text="Filter1"
+            android:text="@string/filter1"
             android:textSize="18sp" />
 
         <Switch
-            android:id="@+id/switch2"
+            android:id="@+id/filter_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
+            android:enabled="false"
             android:padding="15dp"
-            android:text="Filter1"
+            android:text="@string/filter2"
             android:textSize="18sp" />
 
         <Switch
-            android:id="@+id/switch3"
+            android:id="@+id/filter_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
+            android:enabled="false"
             android:padding="15dp"
-            android:text="Filter1"
+            android:text="@string/filter3"
             android:textSize="18sp" />
 
         <Switch
-            android:id="@+id/switch11"
+            android:id="@+id/filter_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
+            android:enabled="false"
             android:padding="15dp"
-            android:text="Filter1"
+            android:text="@string/filter4"
             android:textSize="18sp" />
 
         <Switch
-            android:id="@+id/switch10"
+            android:id="@+id/filter_5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
+            android:enabled="false"
             android:padding="15dp"
-            android:text="Filter1"
+            android:text="@string/filter5"
             android:textSize="18sp" />
 
     </LinearLayout>
