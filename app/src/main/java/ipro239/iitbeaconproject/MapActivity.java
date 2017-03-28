@@ -80,16 +80,17 @@ public class MapActivity extends AppCompatActivity implements BeaconConsumer  {
             @Override
             public void didEnterRegion(Region region) {
                 mapFragment.TurnOnTestBeacon();
-                Uri webpage=Uri.parse("http://www.google.com");
-                Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
+                Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse("http://www.google.com"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
                 PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                        intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        intent,PendingIntent.FLAG_UPDATE_CURRENT);
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(getApplicationContext())
                                 .setSmallIcon(R.drawable.ic_b_active)
                                 .setContentTitle("IIT Beacon")
                                 .setContentText("Find beacon nearby")
+                                .setAutoCancel(true)
                                 .setContentIntent(pi);
 
                 NotificationManager notificationManager =
