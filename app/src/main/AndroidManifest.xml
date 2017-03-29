@@ -25,13 +25,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.TheBeaconApp"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".activities.CreateAccount"
-            android:screenOrientation="portrait"/>
-
-        <activity
             android:name=".activities.MapActivity"
             android:label="IIT Campus Map"
             android:screenOrientation="portrait">

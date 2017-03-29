@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
-        android:padding="15dp"
+        android:padding="20dp"
         android:text="@string/option_change_usermode"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
@@ -28,14 +28,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
-        android:padding="15dp"
+        android:padding="20dp"
         android:text="@string/option_notifications"
         android:textSize="18sp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray" />
 
     <Switch
         android:id="@+id/ui_background"
@@ -43,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
-        android:padding="15dp"
+        android:padding="20dp"
         android:text="@string/option_background"
         android:textSize="18sp" />
 

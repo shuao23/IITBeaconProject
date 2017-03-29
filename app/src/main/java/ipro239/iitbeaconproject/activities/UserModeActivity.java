@@ -14,6 +14,7 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 
 import ipro239.iitbeaconproject.R;
+import ipro239.iitbeaconproject.beacon.BeaconFilters;
 
 /**
  * Created by shuao23 on 3/28/2017.
@@ -21,16 +22,16 @@ import ipro239.iitbeaconproject.R;
 
 public class UserModeActivity extends AppCompatActivity {
 
-
+    //sharedPref key to determine if usermode has been initialized
     private static final String INITIALIZED = "Initialized";
+    //sharedPref key to store the usermode
     private static final String USERMODE = "usermode";
-    public static final String flag="flagStr";
-    private static final String TAG = "UserModeActivity";
-
-    //Represent an integer up to 5 bits to save filter information
-    public static String FILTERS="filters";
+    //sharedPref key to store the flag
+    public static final String FILTERS="filters";
 
     private int previousMode;
+    private BeaconFilters filters;
+    private SharedPreferences preferences;
 
     public static boolean Initialized(Context context){
         SharedPreferences preferences = context.getSharedPreferences(OptionsActivity.BEACON_PREF_NAME, Context.MODE_PRIVATE);
@@ -41,24 +42,43 @@ public class UserModeActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        filters = new BeaconFilters(this);
+        preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
+
         setContentView(R.layout.activity_user_mode);
         loadSavedSettings();
         setAllListeners();
     }
 
     private void loadSavedSettings(){
-        SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
-
         previousMode = preferences.getInt(USERMODE, R.id.ui_student_button);
         ((RadioGroup)findViewById(R.id.ui_usermode_grp)).check(previousMode);
 
-        Log.d(TAG, "filter number get: " + preferences.getInt(FILTERS,0));
-        ((Switch)findViewById(R.id.filter_1)).setChecked((preferences.getInt(FILTERS,0)&1)==1);
-        ((Switch)findViewById(R.id.filter_2)).setChecked((preferences.getInt(FILTERS,0)&2)==2);
-        ((Switch)findViewById(R.id.filter_3)).setChecked((preferences.getInt(FILTERS,0)&4)==4);
-        ((Switch)findViewById(R.id.filter_4)).setChecked((preferences.getInt(FILTERS,0)&8)==8);
-        ((Switch)findViewById(R.id.filter_5)).setChecked((preferences.getInt(FILTERS,0)&16)==16);
+        filters.setFlag(preferences.getInt(FILTERS,0));
+        LinearLayout layout = (LinearLayout)findViewById(R.id.custom_settings_group);
+        for(int i = 0; i < filters.getFilterCount(); i++){
+            Switch filterSwitch = new Switch(this);
+            filterSwitch.setChecked(filters.isFilterFlagged(i));
+            filterSwitch.setText(filters.findFilterByIndex(i));
+            filterSwitch.setTextSize(18);
+            int padding = getResources().getDimensionPixelOffset(R.dimen.option_padding);
+            filterSwitch.setPadding(padding,padding,padding,padding);
+            layout.addView(filterSwitch);
 
+            filterSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        filters.setFilter(buttonView.getText().toString());
+                    }else {
+                        filters.clearFilter(buttonView.getText().toString());
+                    }
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt(FILTERS, filters.getFlag());
+                    editor.apply();
+                }
+            });
+        }
         forceEnableCustomOptions(previousMode);
     }
 
@@ -81,97 +101,6 @@ public class UserModeActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 editor.putInt(USERMODE, checkedId);
                 enableCustomOptions(checkedId);
-            }
-        });
-
-        Switch aSwitch = (Switch)findViewById(R.id.filter_1);
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
-                int filters=preferences.getInt(FILTERS,0);
-                Log.d(TAG,"Filter get, number is:"+filters);
-                if(isChecked){
-                    filters=filters|1;
-                }
-                else{
-                    filters=filters&30;
-                }
-                Log.d(TAG,"Filter 1 set, number is:"+filters);
-                editor.putInt(FILTERS, filters);
-                editor.apply();
-            }
-        });
-        aSwitch = (Switch)findViewById(R.id.filter_2);
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
-                int filters=preferences.getInt(FILTERS,0);
-                Log.d(TAG,"Filter get, number is:"+filters);
-                if(isChecked){
-                    filters=filters|2;
-                }
-                else{
-                    filters=filters&29;
-                }
-                Log.d(TAG,"Filter 2 set, number is:"+filters);
-                editor.putInt(FILTERS, filters);
-                editor.apply();
-            }
-        });
-        aSwitch = (Switch)findViewById(R.id.filter_3);
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
-                int filters=preferences.getInt(FILTERS,0);
-                Log.d(TAG,"Filter get, number is:"+filters);
-                if(isChecked){
-                    filters=filters|4;
-                }
-                else{
-                    filters=filters&27;
-                }
-                Log.d(TAG,"Filter 3 set, number is:"+filters);
-                editor.putInt(FILTERS, filters);
-                editor.apply();
-            }
-        });
-        aSwitch = (Switch)findViewById(R.id.filter_4);
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
-                int filters=preferences.getInt(FILTERS,0);
-                Log.d(TAG,"Filter get, number is:"+filters);
-                if(isChecked){
-                    filters=filters|8;
-                }
-                else{
-                    filters=filters&23;
-                }
-                Log.d(TAG,"Filter 4 set, number is:"+filters);
-                editor.putInt(FILTERS, filters);
-                editor.apply();
-            }
-        });
-        aSwitch = (Switch)findViewById(R.id.filter_5);
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
-                int filters=preferences.getInt(FILTERS,0);
-                Log.d(TAG,"Filter get, number is:"+filters);
-                if(isChecked){
-                    filters=filters|16;
-                }
-                else{
-                    filters=filters&15;
-                }
-                Log.d(TAG,"Filter 5 set, number is:"+filters);
-                editor.putInt(FILTERS, filters);
-                editor.apply();
             }
         });
     }

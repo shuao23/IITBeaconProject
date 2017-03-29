@@ -2,6 +2,8 @@ package ipro239.iitbeaconproject.beacon;
 
 import android.widget.ImageView;
 
+import ipro239.iitbeaconproject.R;
+
 /**
  * Created by shuao23 on 3/24/2017.
  */
