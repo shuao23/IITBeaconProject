@@ -43,6 +43,8 @@ import ipro239.iitbeaconproject.beacon.BeaconConnection;
 import ipro239.iitbeaconproject.beacon.BeaconDisplayer;
 import ipro239.iitbeaconproject.beacon.BeaconXMLParser;
 import ipro239.iitbeaconproject.beacon.ConnectionStatus;
+import ipro239.iitbeaconproject.bluetooth.BLEScanCallback;
+import ipro239.iitbeaconproject.bluetooth.BeaconScanResult;
 import ipro239.iitbeaconproject.bluetooth.BeaconScanResultParser;
 import ipro239.iitbeaconproject.R;
 import ipro239.iitbeaconproject.beacon.BeaconConnectionManager;
@@ -65,13 +67,8 @@ public class MapActivity extends AppCompatActivity  {
     private View uiView;
     private Menu optionMenu;
 
-    //For bluetooth
+    //For scanning beacons
     private BeaconScanner beaconScanner;
-    private BluetoothAdapter bluetoothAdapter;
-    private BluetoothLeScanner bleScanner;
-    private Handler bluetoothHandler = new Handler();
-    private ScanCallback leScanCallback;
-    private BluetoothAdapter.LeScanCallback old_leScanCallback;
 
     //For beacons
     BeaconConnectionManager connectionManager = new BeaconConnectionManager();
@@ -91,13 +88,16 @@ public class MapActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
 
         if(!UserModeActivity.Initialized(this)){
+            //Display the user mode screen if the app is used for the first time
             startActivityForResult(new Intent(this, UserModeActivity.class),INIT_RESULT);
         }else{
+            //Else, if used the app before, call the callback function manually to initialize program
             onActivityResult(INIT_RESULT, 0, null);
         }
     }
 
     @Override
+    //The option menu contains buttons such as the rescan and options button
     public boolean onCreateOptionsMenu(Menu menu) {
         optionMenu = menu;
         getMenuInflater().inflate(R.menu.map_menu, menu);
@@ -117,6 +117,7 @@ public class MapActivity extends AppCompatActivity  {
         return true;
     }
 
+    //Callback Functions----------------------------------------------------------------------------
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == REQUEST_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -128,7 +129,7 @@ public class MapActivity extends AppCompatActivity  {
         if(requestCode == REQUEST_ENABLE_LOC) {
             askForAllPermissions();
         }else if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
-            getBluetoothAdapters();
+            initBeaconScanner();
         }else if(requestCode == INIT_RESULT){ //This first gets called to initialize activity
             setupView();
             askForAllPermissions();
@@ -143,6 +144,7 @@ public class MapActivity extends AppCompatActivity  {
         }
     }
 
+    //Permissions-----------------------------------------------------------------------------------
     private boolean askForAllPermissions(){
         if(!haveLocPermissions()) {
             requestLocPermissions();
@@ -157,7 +159,7 @@ public class MapActivity extends AppCompatActivity  {
             requestBLEPermissions();
             return false;
         }
-        if(!isBluetoothOn()) {
+        if(beaconScanner == null) {
             requestBluetooth();
             return false;
         }
@@ -216,78 +218,41 @@ public class MapActivity extends AppCompatActivity  {
                 new String[]{Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_PERMISSION);
     }
 
-    private void getBluetoothAdapters(){
-        bluetoothAdapter = ((BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            bleScanner = bluetoothAdapter.getBluetoothLeScanner();
-    }
+    private void initBeaconScanner(){
+        BluetoothAdapter bluetoothAdapter = ((BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+        beaconScanner = new BeaconScanner(bluetoothAdapter);
 
-    private boolean isBluetoothOn(){
-        return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
+        beaconScanner.setBLEScanCallbackListener(new BLEScanCallback() {
+            @Override
+            public void onScanStart() {
+                animateScanButton();
+                markerUpdateHandler.postDelayed(markerUpdateRunnable,MARKER_UPDATE_WAIT);
+            }
+
+            @Override
+            public void onScanEnd() {
+                stopanimationScanButton();
+                markerUpdateHandler.removeCallbacks(markerUpdateRunnable);
+                connectionManager.checkConnections();
+                displayChanges();
+            }
+
+            @Override
+            public void onScanResult(BeaconScanResult result) {
+                connectionManager.connect(result.getInstanceID());
+                displayChanges();
+            }
+
+            @Override
+            public void onScanFailed(String message) {
+                Toast.makeText(MapActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void requestBluetooth(){
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-    }
-
-    private boolean isBLECallbackInit(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            return leScanCallback != null;
-        }else{
-            return old_leScanCallback != null;
-        }
-    }
-
-    private void initBLECallback(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            leScanCallback = new ScanCallback() {
-                @Override
-                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                public void onScanResult(int callbackType, ScanResult result) {
-                    BeaconScanResultParser parser = new BeaconScanResultParser(result.getScanRecord().getBytes());
-                    if(parser.validBeacon() && result.getRssi() >= parser.getTxPower()) {
-                        connectionManager.connect(parser.getInstanceID());
-                        displayChanges();
-                    }
-                }
-
-                //IDK what this is but never gets called
-                /*@Override
-                public void onBatchScanResults(List<ScanResult> results) {}*/
-
-                @Override
-                public void onScanFailed(int errorCode) {
-                    final String message;
-                    if(errorCode == SCAN_FAILED_INTERNAL_ERROR)
-                        message = "Internal Error";
-                    else if(errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED)
-                        message = "Not supported";
-                    else if(errorCode == SCAN_FAILED_APPLICATION_REGISTRATION_FAILED)
-                        message = "An application error occured";
-                    else
-                        return;
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(MapActivity.this, message, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            };
-        }else{
-             old_leScanCallback = new BluetoothAdapter.LeScanCallback() {
-                @Override
-                public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    BeaconScanResultParser parser = new BeaconScanResultParser(scanRecord);
-                    if(parser.validBeacon() && rssi >= parser.getTxPower()) {
-                        connectionManager.connect(parser.getInstanceID());
-                        displayChanges();
-                    }
-                }
-            };
-        }
     }
 
     private void setupView(){
@@ -342,39 +307,21 @@ public class MapActivity extends AppCompatActivity  {
             optionMenu.findItem(R.id.menu_rescan).setEnabled(true);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startScan(){
         if(!askForAllPermissions())
             return;
 
-        if(!isBLECallbackInit())
-            initBLECallback();
+        if(beaconScanner == null)
+            return;
 
-        animateScanButton();
-        bluetoothHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                stopScan();
-            }
-        }, SCAN_LENGTH);
-        if(bleScanner == null)
-            bluetoothAdapter.startLeScan(old_leScanCallback);
-        else{
-            bleScanner.startScan(leScanCallback);
-        }
-        markerUpdateHandler.postDelayed(markerUpdateRunnable,MARKER_UPDATE_WAIT);
+        beaconScanner.startScan(SCAN_LENGTH);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void stopScan(){
-        stopanimationScanButton();
-        if(bleScanner == null)
-            bluetoothAdapter.stopLeScan(old_leScanCallback);
-        else
-            bleScanner.stopScan(leScanCallback);
-        markerUpdateHandler.removeCallbacks(markerUpdateRunnable);
-        connectionManager.checkConnections();
-        displayChanges();
+    private void stopScan() {
+        if (beaconScanner == null)
+            return;
+
+        beaconScanner.stopScan();
     }
 
     private void displayChanges(){

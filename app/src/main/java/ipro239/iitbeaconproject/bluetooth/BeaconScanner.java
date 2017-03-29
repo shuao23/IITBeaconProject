@@ -25,9 +25,64 @@ public class BeaconScanner {
     private BLEScanCallbackInterface BLEScanCallbackListener;
 
     public BeaconScanner(BluetoothAdapter bluetoothAdapter){
+        if(bluetoothAdapter == null)
+            return;
+
         this.bluetoothAdapter = bluetoothAdapter;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             bleScanner = bluetoothAdapter.getBluetoothLeScanner();
+        initBLECallback();
+    }
+
+    public boolean initialized(){
+        return bluetoothAdapter != null;
+    }
+
+    public void setBluetoothAdapter(BluetoothAdapter adapter){
+        if(bluetoothAdapter == null)
+            return;
+
+        this.bluetoothAdapter = adapter;
+        initBLECallback();
+    }
+
+    public void setBLEScanCallbackListener(BLEScanCallbackInterface BLEScanCallbackListener) {
+        this.BLEScanCallbackListener = BLEScanCallbackListener;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void startScan(int scanLength){
+        if(bluetoothAdapter == null)
+            return;
+
+        bluetoothHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stopScan();
+            }
+        }, scanLength);
+        if(bleScanner == null)
+            bluetoothAdapter.startLeScan(old_leScanCallback);
+        else{
+            bleScanner.startScan(leScanCallback);
+        }
+
+        if(BLEScanCallbackListener != null)
+            BLEScanCallbackListener.onScanStart();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void stopScan(){
+        if(bluetoothAdapter == null)
+            return;
+
+        if(bleScanner == null)
+            bluetoothAdapter.stopLeScan(old_leScanCallback);
+        else
+            bleScanner.stopScan(leScanCallback);
+
+        if(BLEScanCallbackListener != null)
+            BLEScanCallbackListener.onScanEnd();
     }
 
     private boolean BLECallbackInitDone(){
@@ -39,6 +94,9 @@ public class BeaconScanner {
     }
 
     private void initBLECallback(){
+        if(bluetoothAdapter == null)
+            return;
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             leScanCallback = new ScanCallback() {
                 @Override
@@ -52,9 +110,9 @@ public class BeaconScanner {
                             BeaconScannerHelper.PDU, BeaconScannerHelper.UUID);
                     if(parsedResult != null){
                         if(scanResult.getRssi() >= parsedResult.getTxPower()) {
-                            BLEScanCallbackListener.onScanResult();
+                            BLEScanCallbackListener.onScanResult(parsedResult);
                         }
-                        BLEScanCallbackListener.onRawScanResult();
+                        BLEScanCallbackListener.onRawScanResult(parsedResult);
                     }
                 }
 
@@ -88,40 +146,10 @@ public class BeaconScanner {
                     BeaconScanResult result = new BeaconScanResultParser().
                             parse(scanRecord, BeaconScannerHelper.PDU, BeaconScannerHelper.UUID);
                     if(result != null && rssi >= result.getTxPower())
-                            BLEScanCallbackListener.onScanResult();
-                    BLEScanCallbackListener.onRawScanResult();
+                            BLEScanCallbackListener.onScanResult(result);
+                    BLEScanCallbackListener.onRawScanResult(result);
                 }
             };
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void startScan(int scanLength){
-        if(!BLECallbackInitDone())
-            initBLECallback();
-
-        bluetoothHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                stopScan();
-            }
-        }, scanLength);
-        if(bleScanner == null)
-            bluetoothAdapter.startLeScan(old_leScanCallback);
-        else{
-            bleScanner.startScan(leScanCallback);
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void stopScan(){
-        if(bleScanner == null)
-            bluetoothAdapter.stopLeScan(old_leScanCallback);
-        else
-            bleScanner.stopScan(leScanCallback);
-    }
-
-    public void setBLEScanCallbackListener(BLEScanCallbackInterface BLEScanCallbackListener) {
-        this.BLEScanCallbackListener = BLEScanCallbackListener;
     }
 }

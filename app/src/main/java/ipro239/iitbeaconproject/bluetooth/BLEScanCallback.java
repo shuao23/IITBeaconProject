@@ -7,7 +7,7 @@ package ipro239.iitbeaconproject.bluetooth;
 public abstract class BLEScanCallback implements BLEScanCallbackInterface {
     public void onScanStart(){ }
     public void onScanEnd(){ }
-    public void onScanResult(){ }
-    public void onRawScanResult(){ }
+    public void onScanResult(BeaconScanResult result){ }
+    public void onRawScanResult(BeaconScanResult result){ }
     public void onScanFailed(String message){ }
 }

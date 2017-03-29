@@ -5,12 +5,12 @@ package ipro239.iitbeaconproject.bluetooth;
  */
 
 public class BeaconScanResult {
-    private String namespaceID;
+    private String instanceID;
     private int txPower;
 
     public BeaconScanResult(){}
     public BeaconScanResult(String namespaceID, int txPower){
-        this.namespaceID = namespaceID;
+        this.instanceID = namespaceID;
         this.txPower = txPower;
     }
 
@@ -18,15 +18,15 @@ public class BeaconScanResult {
         return txPower;
     }
 
-    public String getNamespaceID() {
-        return namespaceID;
+    public String getInstanceID() {
+        return instanceID;
     }
 
     public void setTxPower(int txPower) {
         this.txPower = txPower;
     }
 
-    public void setNamespaceID(String namespaceID) {
-        this.namespaceID = namespaceID;
+    public void setInstanceID(String instanceID) {
+        this.instanceID = instanceID;
     }
 }

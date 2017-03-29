@@ -26,7 +26,7 @@ public class BeaconScanResultParser {
             int indexOff = pdu.length + uuid.length + 1;
             sb.append(String.format("%02x", scanRecord[indexOff + i]));
         }
-        result.setNamespaceID(sb.toString().toUpperCase());
+        result.setInstanceID(sb.toString().toUpperCase());
         return result;
     }
 }

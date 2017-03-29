@@ -7,7 +7,7 @@ package ipro239.iitbeaconproject.bluetooth;
 public interface BLEScanCallbackInterface {
     void onScanStart();
     void onScanEnd();
-    void onScanResult();
-    void onRawScanResult();
+    void onScanResult(BeaconScanResult result);
+    void onRawScanResult(BeaconScanResult result);
     void onScanFailed(String message);
 }
