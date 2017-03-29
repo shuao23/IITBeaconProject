@@ -49,7 +49,7 @@ public class UserModeActivity extends AppCompatActivity {
     private void loadSavedSettings(){
         SharedPreferences preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
 
-        previousMode = preferences.getInt(USERMODE,R.id.ui_student_button);
+        previousMode = preferences.getInt(USERMODE, R.id.ui_student_button);
         ((RadioGroup)findViewById(R.id.ui_usermode_grp)).check(previousMode);
 
         ((Switch)findViewById(R.id.filter_1)).setChecked(preferences.getBoolean(FILTER1, false));
@@ -58,7 +58,7 @@ public class UserModeActivity extends AppCompatActivity {
         ((Switch)findViewById(R.id.filter_4)).setChecked(preferences.getBoolean(FILTER4, false));
         ((Switch)findViewById(R.id.filter_5)).setChecked(preferences.getBoolean(FILTER5, false));
 
-        enableCustomOptions(previousMode);
+        forceEnableCustomOptions(previousMode);
     }
 
     private void setAllListeners(){
@@ -122,11 +122,17 @@ public class UserModeActivity extends AppCompatActivity {
 
     private void enableCustomOptions(int id){
         boolean enable = (id == R.id.ui_customuser_button);
-        //if(!enable && previousMode == R.id.ui_customuser_button)
-            //return;
-        //if(enable && previousMode != R.id.ui_customuser_button)
-            //return;
-        Log.d("TEST","SS");
+        if (!enable && previousMode != R.id.ui_customuser_button)
+            return;
+        if (enable && previousMode == R.id.ui_customuser_button)
+            return;
+
+        forceEnableCustomOptions(id);
+        previousMode = id;
+    }
+
+    private void forceEnableCustomOptions(int id){
+        boolean enable = (id == R.id.ui_customuser_button);
         LinearLayout layout = (LinearLayout)findViewById(R.id.custom_settings_group);
         for(int i = 0; i < layout.getChildCount(); i++){
             Switch child = (Switch) layout.getChildAt(i);
