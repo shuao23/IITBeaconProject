@@ -68,9 +68,9 @@ public class UserModeActivity extends AppCompatActivity {
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
                 editor.putBoolean(INITIALIZED, true);
                 editor.apply();
+                finish();
             }
         });
 
