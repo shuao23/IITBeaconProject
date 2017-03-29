@@ -26,12 +26,20 @@ public class UserModeActivity extends AppCompatActivity {
     private static final String INITIALIZED = "Initialized";
     //sharedPref key to store the usermode
     private static final String USERMODE = "usermode";
-    //sharedPref key to store the flag
-    public static final String FILTERS="filters";
+    //sharedPref key to store the custom flag
+    private static final String CUSTOM_FLAG ="custom_flag";
+    //sharedPref key to store the selected flag
+    public static final String SELECTED_FLAG ="selected_flag";
+    public static final int STUDENT_FLAG = 0xD;
+    public static final int FACULTY_FLAG = 0x8;
+    public static final int GUEST_FLAG = BeaconFilters.ALL_FLAGS;
+    private int customFlag;
 
-    private int previousMode;
     private BeaconFilters filters;
+    private int previousMode;
     private SharedPreferences preferences;
+    private SharedPreferences.Editor prefEditor;
+    private LinearLayout customFlagLayout;
 
     public static boolean Initialized(Context context){
         SharedPreferences preferences = context.getSharedPreferences(OptionsActivity.BEACON_PREF_NAME, Context.MODE_PRIVATE);
@@ -42,20 +50,37 @@ public class UserModeActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_user_mode);
+
+        customFlagLayout = (LinearLayout)findViewById(R.id.custom_settings_group);
         filters = new BeaconFilters(this);
         preferences = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE);
+        prefEditor = preferences.edit();
 
-        setContentView(R.layout.activity_user_mode);
+        initSavedPref();
         loadSavedSettings();
         setAllListeners();
+    }
+
+    private void initSavedPref(){
+        if(!preferences.contains(USERMODE))
+            prefEditor.putInt(USERMODE, R.id.ui_student_button);
+
+        if(!preferences.contains(SELECTED_FLAG))
+            prefEditor.putInt(SELECTED_FLAG, STUDENT_FLAG);
+
+        if(!preferences.contains(CUSTOM_FLAG))
+            prefEditor.putInt(CUSTOM_FLAG, 0);
+
+        prefEditor.apply();
     }
 
     private void loadSavedSettings(){
         previousMode = preferences.getInt(USERMODE, R.id.ui_student_button);
         ((RadioGroup)findViewById(R.id.ui_usermode_grp)).check(previousMode);
+        customFlag = preferences.getInt(CUSTOM_FLAG, 0);
+        setFlagToUser(previousMode);
 
-        filters.setFlag(preferences.getInt(FILTERS,0));
-        LinearLayout layout = (LinearLayout)findViewById(R.id.custom_settings_group);
         for(int i = 0; i < filters.getFilterCount(); i++){
             Switch filterSwitch = new Switch(this);
             filterSwitch.setChecked(filters.isFilterFlagged(i));
@@ -63,19 +88,21 @@ public class UserModeActivity extends AppCompatActivity {
             filterSwitch.setTextSize(18);
             int padding = getResources().getDimensionPixelOffset(R.dimen.option_padding);
             filterSwitch.setPadding(padding,padding,padding,padding);
-            layout.addView(filterSwitch);
+            customFlagLayout.addView(filterSwitch);
 
             filterSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked){
-                        filters.setFilter(buttonView.getText().toString());
-                    }else {
-                        filters.clearFilter(buttonView.getText().toString());
+                    if(buttonView.isEnabled()) {
+                        if (isChecked) {
+                            filters.setFilter(buttonView.getText().toString());
+                        } else {
+                            filters.clearFilter(buttonView.getText().toString());
+                        }
+                        customFlag = filters.getFlag();
+                        prefEditor.putInt(CUSTOM_FLAG, customFlag);
+                        prefEditor.apply();
                     }
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt(FILTERS, filters.getFlag());
-                    editor.apply();
                 }
             });
         }
@@ -83,13 +110,13 @@ public class UserModeActivity extends AppCompatActivity {
     }
 
     private void setAllListeners(){
-        final SharedPreferences.Editor editor =
-                getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,Context.MODE_PRIVATE).edit();
+        final SharedPreferences.Editor editor = preferences.edit();
         Button applyButton = (Button) findViewById(R.id.user_mode_apply);
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 editor.putBoolean(INITIALIZED, true);
+                editor.putInt(SELECTED_FLAG, filters.getFlag());
                 editor.apply();
                 finish();
             }
@@ -100,9 +127,28 @@ public class UserModeActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 editor.putInt(USERMODE, checkedId);
+                setFlagToUser(checkedId);
                 enableCustomOptions(checkedId);
+                updateFilterSwitches();
             }
         });
+    }
+
+    private void setFlagToUser(int radioButtonID){
+        switch (radioButtonID){
+            case R.id.ui_student_button:
+                filters.setFlag(STUDENT_FLAG);
+                break;
+            case R.id.ui_faculty_button:
+                filters.setFlag(FACULTY_FLAG);
+                break;
+            case R.id.ui_guest_button:
+                filters.setFlag(GUEST_FLAG);
+                break;
+            case R.id.ui_customuser_button:
+                filters.setFlag(customFlag);
+                break;
+        }
     }
 
     private void enableCustomOptions(int id){
@@ -124,5 +170,12 @@ public class UserModeActivity extends AppCompatActivity {
             child.setEnabled(enable);
         }
         previousMode = id;
+    }
+
+    private void updateFilterSwitches(){
+        for(int i = 0; i < customFlagLayout.getChildCount(); i++) {
+            Switch filterSwitch = (Switch)customFlagLayout.getChildAt(i);
+            filterSwitch.setChecked(filters.isFilterFlagged(i));
+        }
     }
 }

@@ -25,20 +25,14 @@ public class OptionsActivity extends AppCompatActivity {
         //Setup the back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_option);
-
-        TextView text = (TextView)findViewById(R.id.ui_user_mode);
-        text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(OptionsActivity.this, UserModeActivity.class));
-            }
-        });
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-
+            case android.R.id.home:
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

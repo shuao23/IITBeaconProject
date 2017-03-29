@@ -15,9 +15,6 @@ import ipro239.iitbeaconproject.beacon.ConnectionStatus;
 
 public class BeaconConnectionManager {
 
-    private static final float CONNECTION_TIMEOUT = 3000;
-
-    private Timer timer = new Timer();
     private HashMap<String, Boolean> connectedBeacons = new HashMap<>();
     private Queue<BeaconConnection> connectionQue = new LinkedList<>();
 

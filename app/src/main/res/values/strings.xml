@@ -10,6 +10,7 @@
     <string name="option_custom_settings">Custom Mode</string>
     <string name="menu_rescan">Rescan</string>
     <string name="menu_options">Options</string>
+    <string name="menu_usermode">Change User Mode</string>
     <string name="dialog_ok">YES</string>
     <string name="dialog_no">NO</string>
     <string name="dialog_loc_msg">Application is requesting permission to turn on Location Services. Allow?</string>

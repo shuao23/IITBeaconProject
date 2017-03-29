@@ -9,6 +9,9 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/menu_usermode"
+        android:title="@string/option_change_usermode" />
+    <item
         android:id="@+id/menu_options"
         android:title="@string/menu_options"
         app:showAsAction="collapseActionView" />

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="beacon_filters">
-        <item>Filter 1</item>
-        <item>Filter 2</item>
+        <item>Events</item>
+        <item>Sightseeing</item>
+        <item>Entertainment</item>
+        <item>Education</item>
     </string-array>
 </resources>

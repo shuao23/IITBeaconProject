@@ -1,19 +1,14 @@
 package ipro239.iitbeaconproject.activities;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -41,11 +36,11 @@ import java.util.List;
 import ipro239.iitbeaconproject.beacon.Beacon;
 import ipro239.iitbeaconproject.beacon.BeaconConnection;
 import ipro239.iitbeaconproject.beacon.BeaconDisplayer;
+import ipro239.iitbeaconproject.beacon.BeaconFilters;
 import ipro239.iitbeaconproject.beacon.BeaconXMLParser;
 import ipro239.iitbeaconproject.beacon.ConnectionStatus;
 import ipro239.iitbeaconproject.bluetooth.BLEScanCallback;
 import ipro239.iitbeaconproject.bluetooth.BeaconScanResult;
-import ipro239.iitbeaconproject.bluetooth.BeaconScanResultParser;
 import ipro239.iitbeaconproject.R;
 import ipro239.iitbeaconproject.beacon.BeaconConnectionManager;
 import ipro239.iitbeaconproject.bluetooth.BeaconScanner;
@@ -58,7 +53,7 @@ public class MapActivity extends AppCompatActivity  {
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
     private static final int INIT_RESULT = 123;             //Used for callback when the initial usermode settings gets displayed
-    private static final int OPTION_CALLBACK = 457;
+    private static final int USERMODE_CALLBACK = 457;
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
     private static final String BEACON_PREF_NAME = "BeaconOptions";
@@ -97,6 +92,15 @@ public class MapActivity extends AppCompatActivity  {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        SharedPreferences.Editor editor = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE).edit();
+        editor.clear();
+        editor.apply();
+    }
+
+    @Override
     //The option menu contains buttons such as the rescan and options button
     public boolean onCreateOptionsMenu(Menu menu) {
         optionMenu = menu;
@@ -111,7 +115,10 @@ public class MapActivity extends AppCompatActivity  {
                 startScan();
                 break;
             case R.id.menu_options:
-                startActivityForResult(new Intent(this, OptionsActivity.class), OPTION_CALLBACK);
+                startActivity(new Intent(this, OptionsActivity.class));
+                break;
+            case R.id.menu_usermode:
+                startActivityForResult(new Intent(this, UserModeActivity.class), USERMODE_CALLBACK);
                 break;
         }
         return true;
@@ -137,9 +144,12 @@ public class MapActivity extends AppCompatActivity  {
             //Display all beacons from xml file
             beaconDisplayer = new BeaconDisplayer(this, mapView);
             beaconDisplayer.addBeacons(getBeaconData());
+            SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
+            beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
-        }else if(requestCode == OPTION_CALLBACK){
-            //SharedPreferences preferences  = getSharedPreferences("", );
+        }else if(requestCode == USERMODE_CALLBACK){
+            SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
+            beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
         }
     }

@@ -30,21 +30,21 @@
                 android:textSize="18sp" />
 
             <RadioButton
-                android:id="@+id/ui_guest_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="15dp"
-                android:text="@string/option_guest"
-                android:textSize="18sp" />
-
-            <RadioButton
                 android:id="@+id/ui_faculty_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="15dp"
                 android:text="@string/option_faculty"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/ui_guest_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="15dp"
+                android:text="@string/option_guest"
                 android:textSize="18sp" />
 
             <RadioButton
