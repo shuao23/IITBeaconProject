@@ -1,7 +1,9 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import ipro239.iitbeaconproject.R;
 
 public class CreateAccount extends AppCompatActivity {
 

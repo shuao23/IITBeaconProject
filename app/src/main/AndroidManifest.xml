@@ -25,14 +25,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".TheBeaconApp"
+            android:name=".activities.TheBeaconApp"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".CreateAccount"
+        <activity android:name=".activities.CreateAccount"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".MapActivity"
+            android:name=".activities.MapActivity"
             android:label="IIT Campus Map"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -42,12 +42,12 @@
         </activity>
 
         <activity
-            android:name=".OptionsActivity"
+            android:name=".activities.OptionsActivity"
             android:label="Options"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".UserModeActivity"
+            android:name=".activities.UserModeActivity"
             android:label="User Mode"
             android:screenOrientation="portrait"/>
 

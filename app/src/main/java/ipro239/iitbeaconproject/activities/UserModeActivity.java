@@ -1,19 +1,19 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+
+import ipro239.iitbeaconproject.R;
 
 /**
  * Created by shuao23 on 3/28/2017.

@@ -1,4 +1,4 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -38,6 +38,16 @@ import com.qozix.tileview.widgets.ZoomPanLayout;
 import java.io.InputStream;
 import java.util.List;
 
+import ipro239.iitbeaconproject.beacon.Beacon;
+import ipro239.iitbeaconproject.beacon.BeaconConnection;
+import ipro239.iitbeaconproject.beacon.BeaconDisplayer;
+import ipro239.iitbeaconproject.beacon.BeaconXMLParser;
+import ipro239.iitbeaconproject.beacon.ConnectionStatus;
+import ipro239.iitbeaconproject.bluetooth.BeaconScanResultParser;
+import ipro239.iitbeaconproject.R;
+import ipro239.iitbeaconproject.beacon.BeaconConnectionManager;
+import ipro239.iitbeaconproject.bluetooth.BeaconScanner;
+
 public class MapActivity extends AppCompatActivity  {
 
     //Statics
@@ -45,7 +55,8 @@ public class MapActivity extends AppCompatActivity  {
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
-    private static final int INIT_RESULT = 123;
+    private static final int INIT_RESULT = 123;             //Used for callback when the initial usermode settings gets displayed
+    private static final int OPTION_CALLBACK = 457;
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
     private static final String BEACON_PREF_NAME = "BeaconOptions";
@@ -55,9 +66,9 @@ public class MapActivity extends AppCompatActivity  {
     private Menu optionMenu;
 
     //For bluetooth
+    private BeaconScanner beaconScanner;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bleScanner;
-    private boolean isScanning;
     private Handler bluetoothHandler = new Handler();
     private ScanCallback leScanCallback;
     private BluetoothAdapter.LeScanCallback old_leScanCallback;
@@ -100,50 +111,11 @@ public class MapActivity extends AppCompatActivity  {
                 startScan();
                 break;
             case R.id.menu_options:
-                startActivity(new Intent(this, OptionsActivity.class));
+                startActivityForResult(new Intent(this, OptionsActivity.class), OPTION_CALLBACK);
                 break;
         }
         return true;
     }
-
-    /*@Override
-    public void onBeaconServiceConnect() {
-        Identifier uuid = Identifier.parse("");
-        Region testRegion = new Region("test_region", null, null, null);
-        beaconManager.addMonitorNotifier(new MonitorNotifier() {
-            @Override
-            public void didEnterRegion(Region region) {
-                Uri webpage=Uri.parse("http://www.google.com");
-                Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
-                //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                        intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.drawable.ic_b_active)
-                                .setContentTitle("IIT BeaconDisplay")
-                                .setContentText("Find beacon nearby")
-                                .setContentIntent(pi);
-
-                NotificationManager notificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            }
-
-            @Override
-            public void didExitRegion(Region region) {
-
-            }
-
-            @Override
-            public void didDetermineStateForRegion(int i, Region region) {
-            }
-        });
-        try {
-            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
-        }
-        catch (RemoteException e) {    }
-    }*/
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -156,17 +128,17 @@ public class MapActivity extends AppCompatActivity  {
         if(requestCode == REQUEST_ENABLE_LOC) {
             askForAllPermissions();
         }else if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
-            turnBluetoothOn();
-        }else if(requestCode == INIT_RESULT){
+            getBluetoothAdapters();
+        }else if(requestCode == INIT_RESULT){ //This first gets called to initialize activity
             setupView();
             askForAllPermissions();
-            List<BeaconDisplay> beacons = getBeaconData();
-            if(beacons != null) {
-                beaconDisplayer = new BeaconDisplayer(this, mapView);
-                for(int i = 0; i < beacons.size(); i++){
-                    beaconDisplayer.addBeacon(beacons.get(i));
-                }
-            }
+
+            //Display all beacons from xml file
+            beaconDisplayer = new BeaconDisplayer(this, mapView);
+            beaconDisplayer.addBeacons(getBeaconData());
+            beaconDisplayer.updateDisplay();
+        }else if(requestCode == OPTION_CALLBACK){
+            //SharedPreferences preferences  = getSharedPreferences("", );
             beaconDisplayer.updateDisplay();
         }
     }
@@ -244,7 +216,7 @@ public class MapActivity extends AppCompatActivity  {
                 new String[]{Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_PERMISSION);
     }
 
-    private void turnBluetoothOn(){
+    private void getBluetoothAdapters(){
         bluetoothAdapter = ((BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             bleScanner = bluetoothAdapter.getBluetoothLeScanner();
@@ -273,7 +245,7 @@ public class MapActivity extends AppCompatActivity  {
                 @Override
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 public void onScanResult(int callbackType, ScanResult result) {
-                    IITBeaconParser parser = new IITBeaconParser(result.getScanRecord().getBytes());
+                    BeaconScanResultParser parser = new BeaconScanResultParser(result.getScanRecord().getBytes());
                     if(parser.validBeacon() && result.getRssi() >= parser.getTxPower()) {
                         connectionManager.connect(parser.getInstanceID());
                         displayChanges();
@@ -282,12 +254,7 @@ public class MapActivity extends AppCompatActivity  {
 
                 //IDK what this is but never gets called
                 /*@Override
-                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                public void onBatchScanResults(List<ScanResult> results) {
-                    for (ScanResult result:results) {
-                        debugBeacons("Batch: ", result.getScanRecord().getBytes());
-                    }
-                }*/
+                public void onBatchScanResults(List<ScanResult> results) {}*/
 
                 @Override
                 public void onScanFailed(int errorCode) {
@@ -313,7 +280,7 @@ public class MapActivity extends AppCompatActivity  {
              old_leScanCallback = new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    IITBeaconParser parser = new IITBeaconParser(scanRecord);
+                    BeaconScanResultParser parser = new BeaconScanResultParser(scanRecord);
                     if(parser.validBeacon() && rssi >= parser.getTxPower()) {
                         connectionManager.connect(parser.getInstanceID());
                         displayChanges();
@@ -390,7 +357,6 @@ public class MapActivity extends AppCompatActivity  {
                 stopScan();
             }
         }, SCAN_LENGTH);
-        isScanning = true;
         if(bleScanner == null)
             bluetoothAdapter.startLeScan(old_leScanCallback);
         else{
@@ -401,7 +367,6 @@ public class MapActivity extends AppCompatActivity  {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void stopScan(){
-        isScanning = false;
         stopanimationScanButton();
         if(bleScanner == null)
             bluetoothAdapter.stopLeScan(old_leScanCallback);
@@ -413,19 +378,19 @@ public class MapActivity extends AppCompatActivity  {
     }
 
     private void displayChanges(){
-        BeaconConnectionManager.BeaconConnection connection = connectionManager.popConnectionQueue();
+        BeaconConnection connection = connectionManager.popConnectionQueue();
         while (connection != null) {
-            if (connection.status == BeaconConnectionManager.Status.CONNECTED)
-                beaconDisplayer.changeBeaconState(connection.id, true);
+            if (connection.getStatus() == ConnectionStatus.CONNECTED)
+                beaconDisplayer.changeBeaconState(connection.getId(), true);
             else
-                beaconDisplayer.changeBeaconState(connection.id, false);
+                beaconDisplayer.changeBeaconState(connection.getId(), false);
             connection = connectionManager.popConnectionQueue();
         }
     }
 
-    private List<BeaconDisplay> getBeaconData(){
+    private List<Beacon> getBeaconData(){
         //Display beacons
-        List<BeaconDisplay> result;
+        List<Beacon> result;
         InputStream inputStream = getResources().openRawResource(R.raw.beacons);
         BeaconXMLParser parser = new BeaconXMLParser();
         try {
@@ -442,3 +407,43 @@ public class MapActivity extends AppCompatActivity  {
         return result;
     }
 }
+
+
+    /*@Override
+    public void onBeaconServiceConnect() {
+        Identifier uuid = Identifier.parse("");
+        Region testRegion = new Region("test_region", null, null, null);
+        beaconManager.addMonitorNotifier(new MonitorNotifier() {
+            @Override
+            public void didEnterRegion(Region region) {
+                Uri webpage=Uri.parse("http://www.google.com");
+                Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
+                //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+                        intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(getApplicationContext())
+                                .setSmallIcon(R.drawable.ic_b_active)
+                                .setContentTitle("IIT Beacon")
+                                .setContentText("Find beacon nearby")
+                                .setContentIntent(pi);
+
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            }
+
+            @Override
+            public void didExitRegion(Region region) {
+
+            }
+
+            @Override
+            public void didDetermineStateForRegion(int i, Region region) {
+            }
+        });
+        try {
+            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
+        }
+        catch (RemoteException e) {    }
+    }*/

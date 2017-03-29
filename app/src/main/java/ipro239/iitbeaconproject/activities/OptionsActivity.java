@@ -1,17 +1,14 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import ipro239.iitbeaconproject.R;
 
 /**
  * Created by shuao23 on 3/25/2017.

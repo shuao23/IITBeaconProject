@@ -1,13 +1,12 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.beacon;
 
-import android.bluetooth.le.ScanFilter;
 import android.widget.ImageView;
 
 /**
  * Created by shuao23 on 3/24/2017.
  */
 
-public class BeaconDisplay {
+public class Beacon {
 
     public static final int TAG1 = (1<<0);
     public static final int TAG2 = (1<<1);
@@ -22,49 +21,49 @@ public class BeaconDisplay {
     public static final int TAG_ALL = ~0;
 
     public static class Builder{
-        private BeaconDisplay beaconDisplay = new BeaconDisplay();
+        private Beacon beacon = new Beacon();
 
-        public BeaconDisplay build(){
-            return beaconDisplay;
+        public Beacon build(){
+            return beacon;
         }
 
         public Builder setInstanceID(String id){
-            beaconDisplay.setInstanceID(id);
+            beacon.setInstanceID(id);
             return this;
         }
 
         public Builder setName(String name){
-            beaconDisplay.setName(name);
+            beacon.setName(name);
             return this;
         }
 
         public Builder setTags(int tags) {
-            beaconDisplay.setTags(tags);
+            beacon.setTags(tags);
             return this;
         }
 
         public Builder setDescription(String description){
-            beaconDisplay.setDescription(description);
+            beacon.setDescription(description);
             return this;
         }
 
         public Builder setUrl(String url) {
-            beaconDisplay.setUrl(url);
+            beacon.setUrl(url);
             return this;
         }
 
         public Builder setLocation(Coord location) {
-            beaconDisplay.setLocation(location);
+            beacon.setLocation(location);
             return this;
         }
 
         public Builder setLocation(int x, int y) {
-            beaconDisplay.setLocation(new Coord(x, y));
+            beacon.setLocation(new Coord(x, y));
             return this;
         }
 
         public Builder setMarker(ImageView marker){
-            beaconDisplay.setMarker(marker);
+            beacon.setMarker(marker);
             return this;
         }
     }

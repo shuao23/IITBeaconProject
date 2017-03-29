@@ -1,4 +1,4 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.beacon;
 
 /**
  * Created by shuao23 on 3/24/2017.

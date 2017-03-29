@@ -1,4 +1,4 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.beacon;
 
 import android.util.Xml;
 
@@ -7,7 +7,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
 public class BeaconXMLParser {
     private static final String namespace = null;
 
-    public List<BeaconDisplay> parse(InputStream in) throws XmlPullParserException, IOException {
+    public List<Beacon> parse(InputStream in) throws XmlPullParserException, IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
@@ -30,7 +29,7 @@ public class BeaconXMLParser {
         }
     }
 
-    private List<BeaconDisplay> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private List<Beacon> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
         List beacons = new ArrayList();
 
         parser.require(XmlPullParser.START_TAG, namespace, "beacons");
@@ -49,7 +48,7 @@ public class BeaconXMLParser {
         return beacons;
     }
 
-    private BeaconDisplay readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private Beacon readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, namespace, "beacon");
         String instanceID = null;
         String name = null;
@@ -78,7 +77,7 @@ public class BeaconXMLParser {
                 skip(parser);
             }
         }
-        BeaconDisplay.Builder builder = new BeaconDisplay.Builder();
+        Beacon.Builder builder = new Beacon.Builder();
         builder.setName(name)
                 .setInstanceID(instanceID)
                 .setTags(tag)

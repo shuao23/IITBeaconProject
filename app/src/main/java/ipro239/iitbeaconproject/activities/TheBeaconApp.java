@@ -1,4 +1,4 @@
-package ipro239.iitbeaconproject;
+package ipro239.iitbeaconproject.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import static ipro239.iitbeaconproject.R.id.btnGuest;
+import ipro239.iitbeaconproject.R;
 
 public class TheBeaconApp extends AppCompatActivity {
     private Button btnLogin,btnCreate, btnGuest;
