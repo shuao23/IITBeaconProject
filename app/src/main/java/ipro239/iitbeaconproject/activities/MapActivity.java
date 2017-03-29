@@ -3,6 +3,7 @@ package ipro239.iitbeaconproject.activities;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,7 +49,6 @@ import ipro239.iitbeaconproject.bluetooth.BeaconScanner;
 public class MapActivity extends AppCompatActivity  {
 
     //Statics
-    private static final int NOTIFICATION_ID = 691;
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
@@ -56,7 +56,6 @@ public class MapActivity extends AppCompatActivity  {
     private static final int USERMODE_CALLBACK = 457;
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
-    private static final String BEACON_PREF_NAME = "BeaconOptions";
 
     private TileView mapView;
     private View uiView;
@@ -89,15 +88,6 @@ public class MapActivity extends AppCompatActivity  {
             //Else, if used the app before, call the callback function manually to initialize program
             onActivityResult(INIT_RESULT, 0, null);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        SharedPreferences.Editor editor = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE).edit();
-        editor.clear();
-        editor.apply();
     }
 
     @Override
@@ -231,7 +221,7 @@ public class MapActivity extends AppCompatActivity  {
     private void initBeaconScanner(){
         BluetoothAdapter bluetoothAdapter = ((BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
         beaconScanner = new BeaconScanner(bluetoothAdapter);
-
+        beaconScanner.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
         beaconScanner.setBLEScanCallbackListener(new BLEScanCallback() {
             @Override
             public void onScanStart() {

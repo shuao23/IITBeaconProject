@@ -7,9 +7,13 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
+
+import java.util.List;
 
 /**
  * Created by shuao23 on 3/28/2017.
@@ -23,6 +27,7 @@ public class BeaconScanner {
     private ScanCallback leScanCallback;
     private BluetoothAdapter.LeScanCallback old_leScanCallback;
     private BLEScanCallbackInterface BLEScanCallbackListener;
+    private int scanMode = ScanSettings.SCAN_MODE_BALANCED;
 
     public BeaconScanner(BluetoothAdapter bluetoothAdapter){
         if(bluetoothAdapter == null)
@@ -38,6 +43,10 @@ public class BeaconScanner {
         return bluetoothAdapter != null;
     }
 
+    public void setScanMode(int scanMode){
+        this.scanMode = scanMode;
+    }
+
     public void setBluetoothAdapter(BluetoothAdapter adapter){
         if(bluetoothAdapter == null)
             return;
@@ -48,6 +57,10 @@ public class BeaconScanner {
 
     public void setBLEScanCallbackListener(BLEScanCallbackInterface BLEScanCallbackListener) {
         this.BLEScanCallbackListener = BLEScanCallbackListener;
+    }
+
+    public int getScanMode() {
+        return scanMode;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -61,10 +74,14 @@ public class BeaconScanner {
                 stopScan();
             }
         }, scanLength);
+
+
         if(bleScanner == null)
             bluetoothAdapter.startLeScan(old_leScanCallback);
         else{
-            bleScanner.startScan(leScanCallback);
+            ScanSettings.Builder settingBuilder = new ScanSettings.Builder();
+            settingBuilder.setScanMode(scanMode);
+            bleScanner.startScan(null,settingBuilder.build(),leScanCallback);
         }
 
         if(BLEScanCallbackListener != null)
@@ -113,12 +130,13 @@ public class BeaconScanner {
                             BLEScanCallbackListener.onScanResult(parsedResult);
                         }
                         BLEScanCallbackListener.onRawScanResult(parsedResult);
+                        Log.d("TEST", parsedResult.getInstanceID());
                     }
                 }
 
                 //IDK what this is but never gets called
                 /*@Override
-                public void onBatchScanResults(List<ScanResult> results) {}*/
+                public void onBatchScanResults(List<ScanResult> results) { }*/
 
                 @Override
                 public void onScanFailed(int errorCode) {
