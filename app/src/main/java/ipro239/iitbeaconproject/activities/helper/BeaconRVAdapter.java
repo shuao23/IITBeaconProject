@@ -1,5 +1,7 @@
 package ipro239.iitbeaconproject.activities.helper;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,20 +29,25 @@ public class BeaconRVAdapter extends RecyclerView.Adapter<BeaconViewHolder> {
     public BeaconViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.beacon_cardview, parent, false);
         BeaconViewHolder holder = new BeaconViewHolder(view);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(BeaconViewHolder holder, int position) {
+    public void onBindViewHolder(final BeaconViewHolder holder, final int position) {
         holder.getTittleView().setText(beacons.get(position).getName());
         holder.getDescriptionView().setText(beacons.get(position).getDescription());
         holder.getTypeIconView().setImageResource(BeaconIcon.getIconIDByTag(beacons.get(position).getTags()));
+        holder.setUrl(beacons.get(position).getUrl());
+
+        holder.getContainer().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = beacons.get(position).getUrl();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                v.getContext().startActivity(i);
+            }
+        });
     }
 
     @Override

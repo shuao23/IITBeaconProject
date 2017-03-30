@@ -28,6 +28,7 @@ public class BeaconScanner {
     private BluetoothAdapter.LeScanCallback old_leScanCallback;
     private BLEScanCallbackInterface BLEScanCallbackListener;
     private int scanMode = ScanSettings.SCAN_MODE_BALANCED;
+    private boolean isScanning;
 
     public BeaconScanner(BluetoothAdapter bluetoothAdapter){
         if(bluetoothAdapter == null)
@@ -41,6 +42,10 @@ public class BeaconScanner {
 
     public boolean initialized(){
         return bluetoothAdapter != null;
+    }
+
+    public boolean isScanning(){
+        return isScanning;
     }
 
     public void setScanMode(int scanMode){
@@ -75,7 +80,6 @@ public class BeaconScanner {
             }
         }, scanLength);
 
-
         if(bleScanner == null)
             bluetoothAdapter.startLeScan(old_leScanCallback);
         else{
@@ -84,6 +88,7 @@ public class BeaconScanner {
             bleScanner.startScan(null,settingBuilder.build(),leScanCallback);
         }
 
+        isScanning = true;
         if(BLEScanCallbackListener != null)
             BLEScanCallbackListener.onScanStart();
     }
@@ -98,6 +103,7 @@ public class BeaconScanner {
         else
             bleScanner.stopScan(leScanCallback);
 
+        isScanning = false;
         if(BLEScanCallbackListener != null)
             BLEScanCallbackListener.onScanEnd();
     }

@@ -19,7 +19,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +36,8 @@ import com.qozix.tileview.widgets.ZoomPanLayout;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import ipro239.iitbeaconproject.beacon.Beacon;
@@ -58,8 +59,6 @@ public class MapActivity extends AppCompatActivity  {
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
     private static final int INIT_RESULT = 123;             //Used for callback when the initial usermode settings gets displayed
-    private static final int USERMODE_CALLBACK = 457;
-    private static final int OPTION_CALLBACK = 871;
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
     private static final int NEXT_SCAN_DELAY = 20000;
@@ -70,7 +69,7 @@ public class MapActivity extends AppCompatActivity  {
 
     //For scanning beacons
     private BeaconScanner beaconScanner;
-    private Handler scannerHandler = new Handler();
+    private Handler autoScannerHandler = new Handler();
 
     //For beacons
     BeaconConnectionManager connectionManager = new BeaconConnectionManager();
@@ -102,6 +101,38 @@ public class MapActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
 
+        SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
+
+        //Get the flag settings
+        if(beaconDisplayer != null) {
+            beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
+            beaconDisplayer.updateDisplay();
+        }
+
+        //Get the option settings
+        //If we want to scan in the background, start scan runnable
+        if(beaconScanner != null && preferences.getBoolean(OptionsActivity.BACKGROUND_SCANNING_KEY, false)){
+            autoScannerHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(!beaconScanner.isScanning())
+                        startScan();
+                    autoScannerHandler.postDelayed(this, NEXT_SCAN_DELAY);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //Stop auto scans
+        if(beaconScanner != null) {
+            autoScannerHandler.removeCallbacks(null);
+            if (beaconScanner.isScanning())
+                beaconScanner.stopScan();
+        }
     }
 
     @Override
@@ -119,10 +150,10 @@ public class MapActivity extends AppCompatActivity  {
                 startScan();
                 break;
             case R.id.menu_options:
-                startActivityForResult(new Intent(this, OptionsActivity.class), OPTION_CALLBACK);
+                startActivity(new Intent(this, OptionsActivity.class));
                 break;
             case R.id.menu_usermode:
-                startActivityForResult(new Intent(this, UserModeActivity.class), USERMODE_CALLBACK);
+                startActivity(new Intent(this, UserModeActivity.class));
                 break;
         }
         return true;
@@ -151,11 +182,6 @@ public class MapActivity extends AppCompatActivity  {
             beaconDisplayer.addBeacons(getBeaconData());
             beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
-        }else if(requestCode == USERMODE_CALLBACK){
-            beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
-            beaconDisplayer.updateDisplay();
-        }else if(requestCode == OPTION_CALLBACK){
-
         }
     }
 
@@ -254,7 +280,7 @@ public class MapActivity extends AppCompatActivity  {
 
             @Override
             public void onScanResult(BeaconScanResult result) {
-                connectionManager.connect(result.getInstanceID());
+                connectionManager.connect(result.getInstanceID(), result.getTxPower());
                 displayChanges();
             }
 
@@ -288,7 +314,24 @@ public class MapActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MapActivity.this, NearbyBeaconsListActivity.class);
-                intent.putParcelableArrayListExtra(BeaconListActivity.BEACON_LIST_KEY, (ArrayList<? extends Parcelable>)beaconDisplayer.getOnBeacons());
+                List<BeaconConnection> beaconConnections = connectionManager.getConnectedBeaconIDs();
+                Collections.sort(beaconConnections, new Comparator<BeaconConnection>() {
+                    @Override
+                    public int compare(BeaconConnection o1, BeaconConnection o2) {
+                        if(o1.getTxPower() > o2.getTxPower())
+                            return -1;
+                        else if(o1.getTxPower() < o2.getTxPower())
+                            return 1;
+                        else
+                            return 0;
+                    }
+                });
+                List<Beacon> connectedBeacons = new ArrayList<>(beaconConnections.size());
+                for(int i = 0 ; i < beaconConnections.size(); i++){
+                    connectedBeacons.add(beaconDisplayer.getBeacon(beaconConnections.get(i).getId()));
+                }
+
+                intent.putParcelableArrayListExtra(BeaconListActivity.BEACON_LIST_KEY, (ArrayList<? extends Parcelable>)connectedBeacons);
                 startActivity(intent);
             }
         });
@@ -356,21 +399,6 @@ public class MapActivity extends AppCompatActivity  {
             else
                 beaconDisplayer.changeBeaconState(connection.getId(), false);
             connection = connectionManager.popConnectionQueue();
-        }
-    }
-
-    private void updateOptions(){
-        SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
-        if(preferences.getBoolean(OptionsActivity.BACKGROUND_SCANNING_KEY, false)){
-            scannerHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    startScan();
-                    scannerHandler.postDelayed(this, NEXT_SCAN_DELAY);
-                }
-            });
-        }else{
-            scannerHandler.removeCallbacks(null);
         }
     }
 

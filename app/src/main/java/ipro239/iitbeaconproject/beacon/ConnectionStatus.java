@@ -5,5 +5,21 @@ package ipro239.iitbeaconproject.beacon;
  */
 
 public enum ConnectionStatus {
-    CONNECTED, DISCONNECTED
+    DISCONNECTED (0),
+    CONNECTED (1),
+    DISCONNECTING (2);
+
+    private final int value;
+
+    ConnectionStatus(final int value){
+        this.value = value;
+    }
+
+    public int getValue(){
+        return value;
+    }
+
+    public boolean isConnected(){
+        return value != 0;
+    }
 }

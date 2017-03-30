@@ -93,10 +93,6 @@ public class BeaconDisplayer {
         return beacons.size();
     }
 
-    public List<Beacon> getOnBeacons(){
-        return new ArrayList<>(beacons.values());
-    }
-
     private void removeAllDisplayedBeacons(){
         Iterator<Beacon> itr = beacons.values().iterator();
         while(itr.hasNext()){
