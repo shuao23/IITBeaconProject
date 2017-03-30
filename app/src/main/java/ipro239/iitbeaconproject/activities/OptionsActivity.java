@@ -17,6 +17,7 @@ import ipro239.iitbeaconproject.R;
 public class OptionsActivity extends AppCompatActivity {
 
     public static final String BEACON_PREF_NAME = "BeaconPref";
+    public static final String BACKGROUND_SCANNING_KEY = "background scanning";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

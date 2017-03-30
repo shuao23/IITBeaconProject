@@ -6,7 +6,7 @@
         android:id="@+id/menu_rescan"
         android:icon="@drawable/ic_renew_24dp"
         android:title="@string/menu_rescan"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_usermode"

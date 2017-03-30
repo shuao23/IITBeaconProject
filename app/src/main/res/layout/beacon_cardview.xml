@@ -5,19 +5,23 @@
     android:id="@+id/beacon_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="15dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginTop="8dp"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="0dp"
         android:orientation="horizontal"
         android:padding="15dp">
 
         <ImageView
             android:id="@+id/beacon_type_icon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_marginEnd="15dp"
             android:layout_weight="0"
@@ -35,19 +39,17 @@
                 android:id="@+id/beacon_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 tools:text="BeaconName" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="10dp" />
+                android:layout_height="5dp" />
 
             <TextView
                 android:id="@+id/beacon_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam." />
         </LinearLayout>
     </LinearLayout>

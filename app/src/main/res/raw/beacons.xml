@@ -40,41 +40,41 @@
         <description>This is a test beacon</description>
         <url>http://pop.weclarify.com/</url>
         <location>
-            <x>4000</x>
-            <y>7000</y>
+            <x>6000</x>
+            <y>2000</y>
         </location>
     </beacon>
     <beacon>
         <id>000000000004</id>
         <name>Test Beacon 5</name>
-        <tags>2</tags>
+        <tags>8</tags>
         <description>This is a test beacon</description>
         <url>http://pop.weclarify.com/</url>
         <location>
-            <x>4000</x>
-            <y>7000</y>
+            <x>5400</x>
+            <y>9000</y>
         </location>
     </beacon>
     <beacon>
         <id>000000000005</id>
         <name>Test Beacon 6</name>
-        <tags>2</tags>
+        <tags>1</tags>
         <description>This is a test beacon</description>
         <url>http://pop.weclarify.com/</url>
         <location>
-            <x>4000</x>
-            <y>7000</y>
+            <x>500</x>
+            <y>6000</y>
         </location>
     </beacon>
     <beacon>
         <id>000000000006</id>
         <name>Test Beacon 7</name>
-        <tags>2</tags>
+        <tags>4</tags>
         <description>This is a test beacon</description>
         <url>http://pop.weclarify.com/</url>
         <location>
-            <x>4000</x>
-            <y>7000</y>
+            <x>6500</x>
+            <y>540</y>
         </location>
     </beacon>
 

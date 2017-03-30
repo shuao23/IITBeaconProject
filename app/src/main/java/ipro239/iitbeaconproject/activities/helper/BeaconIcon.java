@@ -10,6 +10,7 @@ public class BeaconIcon {
     public static int getIconIDByTag(int tag){
         switch (tag){
             case (1<<0):
+                return R.mipmap.ic_launcher;
             case (1<<1):
             default:
                 return R.mipmap.ic_b_active;

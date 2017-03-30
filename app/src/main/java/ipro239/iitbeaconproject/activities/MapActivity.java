@@ -19,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,8 +59,10 @@ public class MapActivity extends AppCompatActivity  {
     private static final int REQUEST_ENABLE_LOC = 555;
     private static final int INIT_RESULT = 123;             //Used for callback when the initial usermode settings gets displayed
     private static final int USERMODE_CALLBACK = 457;
+    private static final int OPTION_CALLBACK = 871;
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
+    private static final int NEXT_SCAN_DELAY = 20000;
 
     private TileView mapView;
     private View uiView;
@@ -67,6 +70,7 @@ public class MapActivity extends AppCompatActivity  {
 
     //For scanning beacons
     private BeaconScanner beaconScanner;
+    private Handler scannerHandler = new Handler();
 
     //For beacons
     BeaconConnectionManager connectionManager = new BeaconConnectionManager();
@@ -95,6 +99,12 @@ public class MapActivity extends AppCompatActivity  {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
     //The option menu contains buttons such as the rescan and options button
     public boolean onCreateOptionsMenu(Menu menu) {
         optionMenu = menu;
@@ -109,7 +119,7 @@ public class MapActivity extends AppCompatActivity  {
                 startScan();
                 break;
             case R.id.menu_options:
-                startActivity(new Intent(this, OptionsActivity.class));
+                startActivityForResult(new Intent(this, OptionsActivity.class), OPTION_CALLBACK);
                 break;
             case R.id.menu_usermode:
                 startActivityForResult(new Intent(this, UserModeActivity.class), USERMODE_CALLBACK);
@@ -127,6 +137,7 @@ public class MapActivity extends AppCompatActivity  {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
         if(requestCode == REQUEST_ENABLE_LOC) {
             askForAllPermissions();
         }else if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
@@ -138,13 +149,13 @@ public class MapActivity extends AppCompatActivity  {
             //Display all beacons from xml file
             beaconDisplayer = new BeaconDisplayer(this, mapView);
             beaconDisplayer.addBeacons(getBeaconData());
-            SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
             beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
         }else if(requestCode == USERMODE_CALLBACK){
-            SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
             beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
+        }else if(requestCode == OPTION_CALLBACK){
+
         }
     }
 
@@ -345,6 +356,21 @@ public class MapActivity extends AppCompatActivity  {
             else
                 beaconDisplayer.changeBeaconState(connection.getId(), false);
             connection = connectionManager.popConnectionQueue();
+        }
+    }
+
+    private void updateOptions(){
+        SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
+        if(preferences.getBoolean(OptionsActivity.BACKGROUND_SCANNING_KEY, false)){
+            scannerHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    startScan();
+                    scannerHandler.postDelayed(this, NEXT_SCAN_DELAY);
+                }
+            });
+        }else{
+            scannerHandler.removeCallbacks(null);
         }
     }
 
