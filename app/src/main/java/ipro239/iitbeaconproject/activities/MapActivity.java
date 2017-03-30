@@ -92,12 +92,6 @@ public class MapActivity extends AppCompatActivity  {
             //Else, if used the app before, call the callback function manually to initialize program
             onActivityResult(INIT_RESULT, 0, null);
         }
-
-        Animation bottomUp = AnimationUtils.loadAnimation(MapActivity.this,
-                R.anim.bottom_down);
-        TextView hiddenPanel = (TextView)findViewById(R.id.bottom_bar);
-        hiddenPanel.startAnimation(bottomUp);
-        hiddenPanel.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -362,6 +356,21 @@ public class MapActivity extends AppCompatActivity  {
             Toast.makeText(this, "Could not load beacons", Toast.LENGTH_LONG).show();
         }
         return result;
+    }
+
+    private void showBottomBar(){
+        Animation bottomUp = AnimationUtils.loadAnimation(MapActivity.this,
+                R.anim.bottom_up);
+        TextView hiddenPanel = (TextView)findViewById(R.id.bottom_bar);
+        hiddenPanel.startAnimation(bottomUp);
+        hiddenPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void hideBottomBar(){
+        Animation bottomUp = AnimationUtils.loadAnimation(MapActivity.this,
+                R.anim.bottom_down);
+        TextView hiddenPanel = (TextView)findViewById(R.id.bottom_bar);
+        hiddenPanel.startAnimation(bottomUp);
     }
 }
 
