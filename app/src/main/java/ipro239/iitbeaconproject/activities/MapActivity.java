@@ -11,9 +11,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
@@ -36,6 +35,7 @@ import com.qozix.tileview.TileView;
 import com.qozix.tileview.widgets.ZoomPanLayout;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import ipro239.iitbeaconproject.beacon.Beacon;
@@ -272,6 +272,15 @@ public class MapActivity extends AppCompatActivity  {
         uiView = uiview;
         //Display the base view
         setContentView(baseLayout);
+
+        uiview.findViewById(R.id.bottom_bar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, NearbyBeaconsListActivity.class);
+                intent.putParcelableArrayListExtra(BeaconListActivity.BEACON_LIST_KEY, (ArrayList<? extends Parcelable>)beaconDisplayer.getOnBeacons());
+                startActivity(intent);
+            }
+        });
     }
 
     private TileView createMap(){

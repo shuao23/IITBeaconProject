@@ -4,7 +4,7 @@
         <id>000000000000</id>
         <name>Test Beacon 1</name>
         <tags>1</tags>
-        <description>This is a test beacon</description>
+        <description>This is a test beacon. This is where the description of the beacon will go.It can contain information</description>
         <url>http://pop.weclarify.com/</url>
         <location>
             <x>1500</x>
@@ -35,7 +35,40 @@
     </beacon>
     <beacon>
         <id>000000000003</id>
-        <name>Test Beacon 3</name>
+        <name>Test Beacon 4</name>
+        <tags>2</tags>
+        <description>This is a test beacon</description>
+        <url>http://pop.weclarify.com/</url>
+        <location>
+            <x>4000</x>
+            <y>7000</y>
+        </location>
+    </beacon>
+    <beacon>
+        <id>000000000004</id>
+        <name>Test Beacon 5</name>
+        <tags>2</tags>
+        <description>This is a test beacon</description>
+        <url>http://pop.weclarify.com/</url>
+        <location>
+            <x>4000</x>
+            <y>7000</y>
+        </location>
+    </beacon>
+    <beacon>
+        <id>000000000005</id>
+        <name>Test Beacon 6</name>
+        <tags>2</tags>
+        <description>This is a test beacon</description>
+        <url>http://pop.weclarify.com/</url>
+        <location>
+            <x>4000</x>
+            <y>7000</y>
+        </location>
+    </beacon>
+    <beacon>
+        <id>000000000006</id>
+        <name>Test Beacon 7</name>
         <tags>2</tags>
         <description>This is a test beacon</description>
         <url>http://pop.weclarify.com/</url>

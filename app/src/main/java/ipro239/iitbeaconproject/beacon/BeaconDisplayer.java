@@ -6,6 +6,8 @@ import android.widget.RelativeLayout;
 
 import com.qozix.tileview.TileView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -89,6 +91,10 @@ public class BeaconDisplayer {
 
     public int getBeaconCount(){
         return beacons.size();
+    }
+
+    public List<Beacon> getOnBeacons(){
+        return new ArrayList<>(beacons.values());
     }
 
     private void removeAllDisplayedBeacons(){

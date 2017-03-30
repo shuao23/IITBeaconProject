@@ -1,5 +1,7 @@
 package ipro239.iitbeaconproject.beacon;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.widget.ImageView;
 
 import ipro239.iitbeaconproject.R;
@@ -8,17 +10,8 @@ import ipro239.iitbeaconproject.R;
  * Created by shuao23 on 3/24/2017.
  */
 
-public class Beacon {
+public class Beacon implements Parcelable{
 
-    public static final int TAG1 = (1<<0);
-    public static final int TAG2 = (1<<1);
-    public static final int TAG3 = (1<<2);
-    public static final int TAG4 = (1<<3);
-    public static final int TAG5 = (1<<4);
-    public static final int TAG6 = (1<<5);
-    public static final int TAG7 = (1<<6);
-    public static final int TAG8 = (1<<7);
-    public static final int TAG9 = (1<<8);
     public static final int TAG_NONE = 0;
     public static final int TAG_ALL = ~0;
 
@@ -77,6 +70,12 @@ public class Beacon {
     private String url;
     private Coord location;
     private ImageView marker;
+
+    public Beacon(){}
+
+    public Beacon(Parcel in ) {
+        readFromParcel(in);
+    }
 
     public String getInstanceID() {
         return instanceID;
@@ -142,5 +141,35 @@ public class Beacon {
 
     public void setMarker(ImageView marker) {
         this.marker = marker;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Beacon createFromParcel(Parcel in ) {
+            return new Beacon( in );
+        }
+
+        public Beacon[] newArray(int size) {
+            return new Beacon[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getName());
+        dest.writeString(getDescription());
+        dest.writeString(getUrl());
+        dest.writeInt(getTags());
+    }
+
+    public void readFromParcel(Parcel in){
+        setName(in.readString());
+        setDescription(in.readString());
+        setUrl(in.readString());
+        setTags(in.readInt());
     }
 }

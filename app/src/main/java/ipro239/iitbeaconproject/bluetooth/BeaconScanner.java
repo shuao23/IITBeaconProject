@@ -130,7 +130,6 @@ public class BeaconScanner {
                             BLEScanCallbackListener.onScanResult(parsedResult);
                         }
                         BLEScanCallbackListener.onRawScanResult(parsedResult);
-                        Log.d("TEST", parsedResult.getInstanceID());
                     }
                 }
 

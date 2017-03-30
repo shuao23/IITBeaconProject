@@ -44,6 +44,10 @@
             android:label="User Mode"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".activities.NearbyBeaconsListActivity"
+            android:label="Nearby Beacons"
+            android:screenOrientation="portrait"/>
 
     </application>
 
