@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,11 +22,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qozix.tileview.TileView;
@@ -88,6 +92,12 @@ public class MapActivity extends AppCompatActivity  {
             //Else, if used the app before, call the callback function manually to initialize program
             onActivityResult(INIT_RESULT, 0, null);
         }
+
+        Animation bottomUp = AnimationUtils.loadAnimation(MapActivity.this,
+                R.anim.bottom_down);
+        TextView hiddenPanel = (TextView)findViewById(R.id.bottom_bar);
+        hiddenPanel.startAnimation(bottomUp);
+        hiddenPanel.setVisibility(View.VISIBLE);
     }
 
     @Override
