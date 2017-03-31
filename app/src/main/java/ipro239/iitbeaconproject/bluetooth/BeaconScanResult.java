@@ -7,19 +7,25 @@ package ipro239.iitbeaconproject.bluetooth;
 public class BeaconScanResult {
     private String instanceID;
     private int txPower;
+    private int rssi;
 
     public BeaconScanResult(){}
-    public BeaconScanResult(String namespaceID, int txPower){
+    public BeaconScanResult(String namespaceID, int txPower, int rssi){
         this.instanceID = namespaceID;
         this.txPower = txPower;
+        this.rssi = rssi;
+    }
+
+    public String getInstanceID() {
+        return instanceID;
     }
 
     public int getTxPower() {
         return txPower;
     }
 
-    public String getInstanceID() {
-        return instanceID;
+    public int getRssi() {
+        return rssi;
     }
 
     public void setTxPower(int txPower) {
@@ -28,5 +34,9 @@ public class BeaconScanResult {
 
     public void setInstanceID(String instanceID) {
         this.instanceID = instanceID;
+    }
+
+    public void setRssi(int rssi) {
+        this.rssi = rssi;
     }
 }

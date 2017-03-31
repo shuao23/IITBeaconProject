@@ -73,6 +73,9 @@ public class BeaconScanner {
         if(bluetoothAdapter == null)
             return;
 
+        if(isScanning)
+            return;
+
         bluetoothHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -98,10 +101,14 @@ public class BeaconScanner {
         if(bluetoothAdapter == null)
             return;
 
+        if(!isScanning)
+            return;
+
         if(bleScanner == null)
             bluetoothAdapter.stopLeScan(old_leScanCallback);
         else
             bleScanner.stopScan(leScanCallback);
+        bluetoothHandler.removeCallbacksAndMessages(null);
 
         isScanning = false;
         if(BLEScanCallbackListener != null)
@@ -113,6 +120,19 @@ public class BeaconScanner {
             return leScanCallback != null;
         }else{
             return old_leScanCallback != null;
+        }
+    }
+
+    private void parseResultAndCallback(byte[] scanRecord, int rssi){
+        BeaconScanResultParser parser = new BeaconScanResultParser();
+        BeaconScanResult parsedResult = parser.parse(scanRecord,
+                BeaconScannerHelper.PDU, BeaconScannerHelper.UUID);
+        if(parsedResult != null){
+            parsedResult.setRssi(rssi);
+            if (parsedResult.getRssi() >= parsedResult.getTxPower()) {
+                BLEScanCallbackListener.onScanResult(parsedResult);
+            }
+            BLEScanCallbackListener.onRawScanResult(parsedResult);
         }
     }
 
@@ -128,15 +148,7 @@ public class BeaconScanner {
                     if(BLEScanCallbackListener == null)
                         return;
 
-                    BeaconScanResultParser parser = new BeaconScanResultParser();
-                    BeaconScanResult parsedResult = parser.parse(scanResult.getScanRecord().getBytes(),
-                            BeaconScannerHelper.PDU, BeaconScannerHelper.UUID);
-                    if(parsedResult != null){
-                        if(scanResult.getRssi() >= parsedResult.getTxPower()) {
-                            BLEScanCallbackListener.onScanResult(parsedResult);
-                        }
-                        BLEScanCallbackListener.onRawScanResult(parsedResult);
-                    }
+                    parseResultAndCallback(scanResult.getScanRecord().getBytes(), scanResult.getRssi());
                 }
 
                 //IDK what this is but never gets called
@@ -166,11 +178,7 @@ public class BeaconScanner {
                     if(BLEScanCallbackListener == null)
                         return;
 
-                    BeaconScanResult result = new BeaconScanResultParser().
-                            parse(scanRecord, BeaconScannerHelper.PDU, BeaconScannerHelper.UUID);
-                    if(result != null && rssi >= result.getTxPower())
-                            BLEScanCallbackListener.onScanResult(result);
-                    BLEScanCallbackListener.onRawScanResult(result);
+                    parseResultAndCallback(scanRecord, rssi);
                 }
             };
         }

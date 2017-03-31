@@ -5,14 +5,14 @@ package ipro239.iitbeaconproject.beacon;
  */
 
 public class BeaconConnection{
-    public BeaconConnection(String id, int txPower, ConnectionStatus status){
+    public BeaconConnection(String id, int rssi, ConnectionStatus status){
         this.id = id;
-        this.txPower = txPower;
+        this.rssi = rssi;
         this.status = status;
     }
 
     private String id;
-    private int txPower;
+    private int rssi;
     private ConnectionStatus status;
 
     public ConnectionStatus getStatus() {
@@ -23,8 +23,8 @@ public class BeaconConnection{
         return id;
     }
 
-    public int getTxPower() {
-        return txPower;
+    public int getRssi() {
+        return rssi;
     }
 
     public void setStatus(ConnectionStatus status) {
@@ -35,7 +35,7 @@ public class BeaconConnection{
         this.id = id;
     }
 
-    public void setTxPower(int txPower) {
-        this.txPower = txPower;
+    public void setRssi(int txPower) {
+        this.rssi = txPower;
     }
 }

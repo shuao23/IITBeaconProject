@@ -1,4 +1,4 @@
 <resources>
-    <dimen name="beacon_icon_size">25dp</dimen>
+    <dimen name="beacon_icon_size">15dp</dimen>
     <dimen name="option_padding">15dp</dimen>
 </resources>

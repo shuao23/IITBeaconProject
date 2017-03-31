@@ -1,5 +1,7 @@
 package ipro239.iitbeaconproject.beacon;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,18 +22,13 @@ public class BeaconConnectionManager {
     private HashMap<String, BeaconConnection> connectedBeacons = new HashMap<>();
     private Queue<BeaconConnection> connectionQue = new LinkedList<>();
 
-    public void reinitialize(){
-        connectedBeacons.clear();
-        connectionQue.clear();
-    }
-
-    public void connect(String instanceID, int txPower){
+    public void connect(String instanceID, int rssi){
         if(connectedBeacons.containsKey(instanceID)) {
             BeaconConnection previousConnection = connectedBeacons.get(instanceID);
             previousConnection.setStatus(ConnectionStatus.CONNECTED);
-            previousConnection.setTxPower(txPower);
+            previousConnection.setRssi(rssi);
         }else {
-            BeaconConnection beaconConnection = new BeaconConnection(instanceID, txPower, ConnectionStatus.CONNECTED);
+            BeaconConnection beaconConnection = new BeaconConnection(instanceID, rssi, ConnectionStatus.CONNECTED);
             connectionQue.add(beaconConnection);
             connectedBeacons.put(instanceID, beaconConnection);
         }
@@ -54,6 +51,10 @@ public class BeaconConnectionManager {
         return connectionQue.poll();
     }
 
+    public void clearConnectionQue(){
+        connectionQue.clear();
+    }
+
     public void checkConnections(){
         Iterator<String> iterator =  connectedBeacons.keySet().iterator();
         while (iterator.hasNext()) {
@@ -63,7 +64,7 @@ public class BeaconConnectionManager {
                 case DISCONNECTED:
                 case DISCONNECTING:
                     beaconConnection.setStatus(ConnectionStatus.DISCONNECTED);
-                    beaconConnection.setTxPower(-1);
+                    beaconConnection.setRssi(-1);
                     connectionQue.add(beaconConnection);
                     iterator.remove();
                     break;
@@ -72,6 +73,21 @@ public class BeaconConnectionManager {
                     break;
             }
         }
+    }
 
+    public void disconnectAll(){
+        Iterator<String> iterator =  connectedBeacons.keySet().iterator();
+        while (iterator.hasNext()) {
+            BeaconConnection beaconConnection = connectedBeacons.get(iterator.next());
+            beaconConnection.setStatus(ConnectionStatus.DISCONNECTED);
+            beaconConnection.setRssi(-1);
+            connectionQue.add(beaconConnection);
+            iterator.remove();
+        }
+    }
+
+    public void resetConnections(){
+        connectedBeacons.clear();
+        connectionQue.clear();
     }
 }

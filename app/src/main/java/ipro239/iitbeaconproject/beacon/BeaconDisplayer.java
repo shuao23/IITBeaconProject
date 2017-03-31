@@ -36,7 +36,7 @@ public class BeaconDisplayer {
         Iterator<Beacon> it = beacons.values().iterator();
         while (it.hasNext()){
             Beacon beacon = it.next();
-            if(beacon.getTags() == 0 || (beacon.getTags() & displayTag) != 0){
+            if(validFlag(beacon.getTags())){
                 createBeaconMarker(beacon);
             }
         }
@@ -46,14 +46,21 @@ public class BeaconDisplayer {
         if(!beacons.containsKey(id))
             return;
 
-        if(isOn)
-            beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_active);
-        else
-            beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_inactive);
+        Beacon beacon = beacons.get(id);
+
+        //If flag is currently getting shown
+        if(validFlag(beacon.getTags())) {
+            if (isOn)
+                beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_active);
+            else
+                beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_inactive);
+        }
 
     }
 
     public void addBeacon(Beacon beacon){
+        if(beacon == null)
+            return;
         beacons.put(beacon.getInstanceID(), beacon);
     }
 
@@ -91,6 +98,10 @@ public class BeaconDisplayer {
 
     public int getBeaconCount(){
         return beacons.size();
+    }
+
+    private boolean validFlag(int beaconFlag){
+        return (beaconFlag == 0 || (beaconFlag & displayTag) != 0);
     }
 
     private void removeAllDisplayedBeacons(){

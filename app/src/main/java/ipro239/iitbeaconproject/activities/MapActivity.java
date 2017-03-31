@@ -19,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -107,16 +108,18 @@ public class MapActivity extends AppCompatActivity  {
         if(beaconDisplayer != null) {
             beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
+            connectionManager.resetConnections();
         }
 
         //Get the option settings
         //If we want to scan in the background, start scan runnable
+        if(beaconScanner != null)
+
         if(beaconScanner != null && preferences.getBoolean(OptionsActivity.BACKGROUND_SCANNING_KEY, false)){
             autoScannerHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if(!beaconScanner.isScanning())
-                        startScan();
+                    startScan();
                     autoScannerHandler.postDelayed(this, NEXT_SCAN_DELAY);
                 }
             });
@@ -125,14 +128,11 @@ public class MapActivity extends AppCompatActivity  {
 
     @Override
     protected void onPause() {
-        super.onPause();
-
         //Stop auto scans
-        if(beaconScanner != null) {
-            autoScannerHandler.removeCallbacks(null);
-            if (beaconScanner.isScanning())
-                beaconScanner.stopScan();
-        }
+        autoScannerHandler.removeCallbacksAndMessages(null);
+        stopScan();
+
+        super.onPause();
     }
 
     @Override
@@ -182,6 +182,7 @@ public class MapActivity extends AppCompatActivity  {
             beaconDisplayer.addBeacons(getBeaconData());
             beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
             beaconDisplayer.updateDisplay();
+            connectionManager.resetConnections();
         }
     }
 
@@ -280,7 +281,7 @@ public class MapActivity extends AppCompatActivity  {
 
             @Override
             public void onScanResult(BeaconScanResult result) {
-                connectionManager.connect(result.getInstanceID(), result.getTxPower());
+                connectionManager.connect(result.getInstanceID(), result.getRssi());
                 displayChanges();
             }
 
@@ -318,9 +319,10 @@ public class MapActivity extends AppCompatActivity  {
                 Collections.sort(beaconConnections, new Comparator<BeaconConnection>() {
                     @Override
                     public int compare(BeaconConnection o1, BeaconConnection o2) {
-                        if(o1.getTxPower() > o2.getTxPower())
+                        Log.d("TEST", o1.getRssi() + ", " + o2.getRssi());
+                        if(o1.getRssi() > o2.getRssi())
                             return -1;
-                        else if(o1.getTxPower() < o2.getTxPower())
+                        else if(o1.getRssi() < o2.getRssi())
                             return 1;
                         else
                             return 0;
