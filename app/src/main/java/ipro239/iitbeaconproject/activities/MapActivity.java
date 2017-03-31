@@ -281,8 +281,11 @@ public class MapActivity extends AppCompatActivity  {
 
             @Override
             public void onScanResult(BeaconScanResult result) {
-                connectionManager.connect(result.getInstanceID(), result.getRssi());
-                displayChanges();
+                if(beaconDisplayer != null &&
+                        beaconDisplayer.isDisplayedBeacon(result.getInstanceID())) {
+                    connectionManager.connect(result.getInstanceID(), result.getRssi());
+                    displayChanges();
+                }
             }
 
             @Override

@@ -100,6 +100,19 @@ public class BeaconDisplayer {
         return beacons.size();
     }
 
+    public boolean isDisplayedBeacon(String instanceID){
+        if(instanceID == null)
+            return false;
+
+        if(!beacons.containsKey(instanceID))
+            return false;
+
+        if(!validFlag(beacons.get(instanceID).getTags()))
+            return false;
+
+        return true;
+    }
+
     private boolean validFlag(int beaconFlag){
         return (beaconFlag == 0 || (beaconFlag & displayTag) != 0);
     }
