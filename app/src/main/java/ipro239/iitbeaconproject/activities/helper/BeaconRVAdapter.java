@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import ipro239.iitbeaconproject.R;
+import ipro239.iitbeaconproject.activities.WebActivity;
 import ipro239.iitbeaconproject.beacon.Beacon;
 import ipro239.iitbeaconproject.beacon.BeaconIcons;
 
@@ -43,9 +44,9 @@ public class BeaconRVAdapter extends RecyclerView.Adapter<BeaconViewHolder> {
             @Override
             public void onClick(View v) {
                 String url = beacons.get(position).getUrl();
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                v.getContext().startActivity(i);
+                Intent intent = new Intent(v.getContext(), WebActivity.class);
+                intent.putExtra(WebActivity.URL_KEY, url);
+                v.getContext().startActivity(intent);
             }
         });
     }

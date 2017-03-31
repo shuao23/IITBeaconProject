@@ -391,9 +391,9 @@ public class MapActivity extends AppCompatActivity  {
                     cardView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent i = new Intent(Intent.ACTION_VIEW);
-                            i.setData(Uri.parse(beacon.getUrl()));
-                            v.getContext().startActivity(i);
+                            Intent intent = new Intent(MapActivity.this, WebActivity.class);
+                            intent.putExtra(WebActivity.URL_KEY, beacon.getUrl());
+                            v.getContext().startActivity(intent);
                         }
                     });
                     showSelectedBeaconCard();
