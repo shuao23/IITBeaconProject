@@ -3,7 +3,6 @@ package ipro239.iitbeaconproject.activities.helper;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import java.util.List;
 
 import ipro239.iitbeaconproject.R;
 import ipro239.iitbeaconproject.beacon.Beacon;
+import ipro239.iitbeaconproject.beacon.BeaconIcons;
 
 /**
  * Created by shuao23 on 3/30/2017.
@@ -36,7 +36,7 @@ public class BeaconRVAdapter extends RecyclerView.Adapter<BeaconViewHolder> {
     public void onBindViewHolder(final BeaconViewHolder holder, final int position) {
         holder.getTittleView().setText(beacons.get(position).getName());
         holder.getDescriptionView().setText(beacons.get(position).getDescription());
-        holder.getTypeIconView().setImageResource(BeaconIcon.getIconIDByTag(beacons.get(position).getTags()));
+        holder.getTypeIconView().setImageResource(BeaconIcons.getCardIconIDByTag(beacons.get(position).getTags()));
         holder.setUrl(beacons.get(position).getUrl());
 
         holder.getContainer().setOnClickListener(new View.OnClickListener() {

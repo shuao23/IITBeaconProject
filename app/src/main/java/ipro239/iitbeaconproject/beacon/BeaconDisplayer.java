@@ -1,6 +1,7 @@
 package ipro239.iitbeaconproject.beacon;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -23,12 +24,18 @@ public class BeaconDisplayer {
     private int displayTag = Beacon.TAG_ALL;
     private Activity activity;
     private TileView tileView;
+    private ImageView currentMarker;
     private HashMap<String,Beacon> beacons = new HashMap<>();
-    private HashMap<ImageView,String> beaconIcons = new HashMap<>();
 
     public BeaconDisplayer(Activity activity, TileView tileView){
         this.activity = activity;
         this.tileView = tileView;
+
+        //Initialize marker
+        currentMarker = new ImageView(activity);
+        currentMarker.setImageResource(R.mipmap.ic_selected_marker);
+        int markerSize = activity.getResources().getDimensionPixelSize(R.dimen.selected_marker_size);
+        currentMarker.setLayoutParams(new RelativeLayout.LayoutParams(markerSize, markerSize));
     }
 
     public void updateDisplay(){
@@ -50,10 +57,13 @@ public class BeaconDisplayer {
 
         //If flag is currently getting shown
         if(validFlag(beacon.getTags())) {
+            int imageID;
             if (isOn)
-                beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_active);
+                imageID = BeaconIcons.getActiveMapIconIDByTag(beacon.getTags());
             else
-                beacons.get(id).getMarker().setImageResource(R.mipmap.ic_b_inactive);
+                imageID = BeaconIcons.getInactiveMapIconIDByTag(beacon.getTags());
+
+            beacons.get(id).getMarker().setImageResource(imageID);
         }
 
     }
@@ -72,6 +82,37 @@ public class BeaconDisplayer {
                     this.beacons.put(beacon.getInstanceID(), beacon);
             }
         }
+    }
+
+    public void selectCurrentBeacon(Beacon beacon){
+        selectCurrentBeacon(beacon.getInstanceID());
+    }
+    public void selectCurrentBeacon(String id){
+        removeCurrentBeacon();
+        if(beacons.containsKey(id)){
+            Beacon beacon = beacons.get(id);
+            if(validFlag(beacon.getTags())){
+                tileView.addMarker(currentMarker, beacon.getLocationX(), beacon.getLocationY(), -0.5f, -1.0f);
+            }
+        }
+    }
+
+    public void removeCurrentBeacon(){
+        tileView.removeMarker(currentMarker);
+    }
+
+    public Beacon findBeaconByImageView(View view){
+        if(view == null || !(view instanceof ImageView))
+            return null;
+
+        Iterator<String> itr = beacons.keySet().iterator();
+        while (itr.hasNext()){
+            Beacon beacon = beacons.get(itr.next());
+            if(beacon.getMarker() == view){
+                return beacon;
+            }
+        }
+        return null;
     }
 
     public void removeBeacon(Beacon beaconDisplay){
@@ -127,7 +168,7 @@ public class BeaconDisplayer {
 
     private void createBeaconMarker(Beacon beacon){
         ImageView beaconMarker = new ImageView(activity);
-        beaconMarker.setImageResource(R.mipmap.ic_b_inactive);
+        beaconMarker.setImageResource(BeaconIcons.getInactiveMapIconIDByTag(beacon.getTags()));
         int beaconIconSize = activity.getResources().getDimensionPixelSize(R.dimen.beacon_icon_size);
         beaconMarker.setLayoutParams(new RelativeLayout.LayoutParams(beaconIconSize, beaconIconSize));
         tileView.addMarker(beaconMarker, beacon.getLocationX(), beacon.getLocationY(), -0.5f, -0.5f);

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.Settings;
@@ -19,20 +20,24 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.qozix.tileview.TileView;
+import com.qozix.tileview.hotspots.HotSpot;
+import com.qozix.tileview.markers.MarkerLayout;
 import com.qozix.tileview.widgets.ZoomPanLayout;
 
 import java.io.InputStream;
@@ -41,10 +46,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ipro239.iitbeaconproject.activities.helper.BeaconViewHolder;
 import ipro239.iitbeaconproject.beacon.Beacon;
 import ipro239.iitbeaconproject.beacon.BeaconConnection;
 import ipro239.iitbeaconproject.beacon.BeaconDisplayer;
 import ipro239.iitbeaconproject.beacon.BeaconFilters;
+import ipro239.iitbeaconproject.beacon.BeaconIcons;
 import ipro239.iitbeaconproject.beacon.BeaconXMLParser;
 import ipro239.iitbeaconproject.beacon.ConnectionStatus;
 import ipro239.iitbeaconproject.bluetooth.BLEScanCallback;
@@ -56,6 +63,8 @@ import ipro239.iitbeaconproject.bluetooth.BeaconScanner;
 public class MapActivity extends AppCompatActivity  {
 
     //Statics
+    private static final int MAP_SIZEX = 6823;
+    private static final int MAP_SIZEY = 13866;
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
@@ -84,6 +93,9 @@ public class MapActivity extends AppCompatActivity  {
         }
     };
 
+    //for markers
+    private boolean markerTapped = false;
+    private CardView cardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +125,6 @@ public class MapActivity extends AppCompatActivity  {
 
         //Get the option settings
         //If we want to scan in the background, start scan runnable
-        if(beaconScanner != null)
-
         if(beaconScanner != null && preferences.getBoolean(OptionsActivity.BACKGROUND_SCANNING_KEY, false)){
             autoScannerHandler.post(new Runnable() {
                 @Override
@@ -176,13 +186,6 @@ public class MapActivity extends AppCompatActivity  {
         }else if(requestCode == INIT_RESULT){ //This first gets called to initialize activity
             setupView();
             askForAllPermissions();
-
-            //Display all beacons from xml file
-            beaconDisplayer = new BeaconDisplayer(this, mapView);
-            beaconDisplayer.addBeacons(getBeaconData());
-            beaconDisplayer.setDisplayTag(preferences.getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
-            beaconDisplayer.updateDisplay();
-            connectionManager.resetConnections();
         }
     }
 
@@ -314,7 +317,8 @@ public class MapActivity extends AppCompatActivity  {
         //Display the base view
         setContentView(baseLayout);
 
-        uiview.findViewById(R.id.bottom_bar).setOnClickListener(new View.OnClickListener() {
+        View bottomBar = uiview.findViewById(R.id.nearby_beacon_button);
+        bottomBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MapActivity.this, NearbyBeaconsListActivity.class);
@@ -322,7 +326,6 @@ public class MapActivity extends AppCompatActivity  {
                 Collections.sort(beaconConnections, new Comparator<BeaconConnection>() {
                     @Override
                     public int compare(BeaconConnection o1, BeaconConnection o2) {
-                        Log.d("TEST", o1.getRssi() + ", " + o2.getRssi());
                         if(o1.getRssi() > o2.getRssi())
                             return -1;
                         else if(o1.getRssi() < o2.getRssi())
@@ -340,11 +343,68 @@ public class MapActivity extends AppCompatActivity  {
                 startActivity(intent);
             }
         });
+
+        //Display all beacons from xml file
+        beaconDisplayer = new BeaconDisplayer(this, mapView);
+        beaconDisplayer.addBeacons(getBeaconData());
+        beaconDisplayer.setDisplayTag(getSharedPreferences(OptionsActivity.BEACON_PREF_NAME, MODE_PRIVATE)
+                .getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
+        beaconDisplayer.updateDisplay();
+        connectionManager.resetConnections();
+
+        cardView = (CardView) getLayoutInflater().inflate(R.layout.beacon_cardview, null);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        ((RelativeLayout)uiView).addView(cardView, params);
+        cardView.setVisibility(View.INVISIBLE);
+
+
+        //When the map is tapped
+        HotSpot hotSpot = new HotSpot();
+        hotSpot.set(0, 0, MAP_SIZEX, MAP_SIZEY);
+        mapView.addHotSpot(hotSpot);
+        mapView.setHotSpotTapListener(new HotSpot.HotSpotTapListener() {
+            @Override
+            public void onHotSpotTap(HotSpot hotSpot, int x, int y) {
+                if(markerTapped){
+                    markerTapped = false;
+                    return;
+                }
+                beaconDisplayer.removeCurrentBeacon();
+                hideSelectedBeaconCard();
+            }
+        });
+
+        //When marker is clicked
+        mapView.setMarkerTapListener(new MarkerLayout.MarkerTapListener() {
+            @Override
+            public void onMarkerTap(View view, int x, int y) {
+                markerTapped = true;
+                final Beacon beacon = beaconDisplayer.findBeaconByImageView(view);
+                if(beacon != null) {
+                    beaconDisplayer.selectCurrentBeacon(beacon.getInstanceID());
+                    BeaconViewHolder viewHolder = new BeaconViewHolder(cardView);
+                    viewHolder.getTittleView().setText(beacon.getName());
+                    viewHolder.getDescriptionView().setText(beacon.getDescription());
+                    viewHolder.getTypeIconView().setImageResource(BeaconIcons.getCardIconIDByTag(beacon.getTags()));
+                    cardView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(beacon.getUrl()));
+                            v.getContext().startActivity(i);
+                        }
+                    });
+                    showSelectedBeaconCard();
+                }
+            }
+        });
     }
 
     private TileView createMap(){
         TileView tileView = new TileView(this);
-        tileView.setSize(6823,13866);
+        tileView.setSize(MAP_SIZEX,MAP_SIZEY);
         tileView.addDetailLevel(1f, "map_org_sliced/map_org_tile-%d_%d.png", 256, 256);
         tileView.addDetailLevel(0.69998534369f, "map_70_sliced/map70_tile-%d_%d.png", 256, 256);
         tileView.addDetailLevel(0.39997068738f, "map_40_sliced/map40_tile-%d_%d.png", 256, 256);
@@ -426,19 +486,36 @@ public class MapActivity extends AppCompatActivity  {
         return result;
     }
 
-    private void showBottomBar(){
-        Animation bottomUp = AnimationUtils.loadAnimation(MapActivity.this,
-                R.anim.bottom_up);
-        TextView hiddenPanel = (TextView)findViewById(R.id.bottom_bar);
-        hiddenPanel.startAnimation(bottomUp);
-        hiddenPanel.setVisibility(View.VISIBLE);
+    private void showSelectedBeaconCard(){
+        Animation topDown = AnimationUtils.loadAnimation(MapActivity.this,
+                R.anim.top_down);
+        cardView.startAnimation(topDown);
+        cardView.setVisibility(View.VISIBLE);
     }
 
-    private void hideBottomBar(){
-        Animation bottomUp = AnimationUtils.loadAnimation(MapActivity.this,
-                R.anim.bottom_down);
-        TextView hiddenPanel = (TextView)findViewById(R.id.bottom_bar);
-        hiddenPanel.startAnimation(bottomUp);
+    private void hideSelectedBeaconCard(){
+        if(cardView.getVisibility() == View.INVISIBLE)
+            return;
+
+        Animation topUp = AnimationUtils.loadAnimation(MapActivity.this,
+                R.anim.top_up);
+        topUp.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                cardView.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        cardView.startAnimation(topUp);
     }
 }
 
