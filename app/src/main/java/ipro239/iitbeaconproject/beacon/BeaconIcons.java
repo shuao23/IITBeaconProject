@@ -17,6 +17,8 @@ public class BeaconIcons {
                 return R.mipmap.ic_entertainment;
             case (1<<3):
                 return R.mipmap.ic_student_res;
+            case (1<<4):
+                return R.mipmap.ic_navigation;
             default:
                 return R.mipmap.ic_launcher;
         }

@@ -25,7 +25,7 @@
     <beacon>
         <id>000000000002</id>
         <name>Career Services</name>
-        <tags>1</tags>
+        <tags>8</tags>
         <description>Need a job? These are the people to ask!</description>
         <url>http://iitbeacon.simplesite.com/433454292</url>
         <location>
@@ -36,7 +36,7 @@
     <beacon>
         <id>000000000003</id>
         <name>The Academic Resource Center</name>
-        <tags>2</tags>
+        <tags>8</tags>
         <description>Struggling in class? The ARC is free and available to help!</description>
         <url>http://iitbeacon.simplesite.com/433454294</url>
         <location>
@@ -47,7 +47,7 @@
     <beacon>
         <id>000000000004</id>
         <name>Herman Hall</name>
-        <tags>8</tags>
+        <tags>10</tags>
         <description>Welcome to Herman Hall</description>
         <url>http://iitbeacon.simplesite.com/433488275</url>
         <location>
