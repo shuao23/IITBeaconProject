@@ -7,19 +7,19 @@
         <description>Hungry? Talon's got you!</description>
         <url>http://iitbeacon.simplesite.com/433600964</url>
         <location>
-            <x>1500</x>
-            <y>11177</y>
+            <x>1634</x>
+            <y>6157</y>
         </location>
     </beacon>
     <beacon>
         <id>000000000001</id>
         <name>The Bog</name>
         <tags>4</tags>
-        <description>A fun place</description>
+        <description>A fun place located in the basement</description>
         <url>http://iitbeacon.simplesite.com/433454290</url>
         <location>
-            <x>3500</x>
-            <y>11000</y>
+            <x>1749</x>
+            <y>5915</y>
         </location>
     </beacon>
     <beacon>
@@ -29,8 +29,8 @@
         <description>Need a job? These are the people to ask!</description>
         <url>http://iitbeacon.simplesite.com/433454292</url>
         <location>
-            <x>3000</x>
-            <y>1000</y>
+            <x>1487</x>
+            <y>5783</y>
         </location>
     </beacon>
     <beacon>
@@ -40,8 +40,8 @@
         <description>Struggling in class? The ARC is free and available to help!</description>
         <url>http://iitbeacon.simplesite.com/433454294</url>
         <location>
-            <x>6000</x>
-            <y>2000</y>
+            <x>1438</x>
+            <y>5305</y>
         </location>
     </beacon>
     <beacon>
@@ -51,8 +51,19 @@
         <description>Welcome to Herman Hall</description>
         <url>http://iitbeacon.simplesite.com/433488275</url>
         <location>
-            <x>5400</x>
-            <y>9000</y>
+            <x>1850</x>
+            <y>5412</y>
+        </location>
+    </beacon>
+    <beacon>
+        <id>000000000005</id>
+        <name>Herman Hall</name>
+        <tags>10</tags>
+        <description>Welcome to Herman Hall</description>
+        <url>http://iitbeacon.simplesite.com/433488275</url>
+        <location>
+            <x>1850</x>
+            <y>6059</y>
         </location>
     </beacon>
 
