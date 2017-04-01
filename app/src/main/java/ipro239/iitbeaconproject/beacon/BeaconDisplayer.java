@@ -25,6 +25,7 @@ public class BeaconDisplayer {
     private Activity activity;
     private TileView tileView;
     private ImageView currentMarker;
+    private Beacon selectedBeacon;
     private HashMap<String,Beacon> beacons = new HashMap<>();
 
     public BeaconDisplayer(Activity activity, TileView tileView){
@@ -40,6 +41,8 @@ public class BeaconDisplayer {
 
     public void updateDisplay(){
         removeAllDisplayedBeacons();
+        Beacon removedSelectedBeacon = selectedBeacon;
+        removeCurrentBeacon();
         Iterator<Beacon> it = beacons.values().iterator();
         while (it.hasNext()){
             Beacon beacon = it.next();
@@ -47,6 +50,8 @@ public class BeaconDisplayer {
                 createBeaconMarker(beacon);
             }
         }
+        if(removedSelectedBeacon != null)
+            selectCurrentBeacon(removedSelectedBeacon.getInstanceID());
     }
 
     public void changeBeaconState(String id, boolean isOn){
@@ -93,12 +98,14 @@ public class BeaconDisplayer {
             Beacon beacon = beacons.get(id);
             if(validFlag(beacon.getTags())){
                 tileView.addMarker(currentMarker, beacon.getLocationX(), beacon.getLocationY(), -0.5f, -1.0f);
+                selectedBeacon = beacon;
             }
         }
     }
 
     public void removeCurrentBeacon(){
         tileView.removeMarker(currentMarker);
+        selectedBeacon = null;
     }
 
     public Beacon findBeaconByImageView(View view){

@@ -39,7 +39,7 @@
                 android:id="@+id/beacon_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 tools:text="BeaconName" />
 
             <Space
@@ -50,6 +50,7 @@
                 android:id="@+id/beacon_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="15sp"
                 tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam." />
         </LinearLayout>
     </LinearLayout>
