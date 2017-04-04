@@ -25,12 +25,7 @@ public class BeaconViewHolder extends RecyclerView.ViewHolder {
     public BeaconViewHolder(View itemView) {
         super(itemView);
 
-        Log.d("TEST","---------------------------------------------");
-        Log.d("TEST",String.valueOf(itemView.getId()));
-        Log.d("TEST",String.valueOf(R.id.beacon_card));
-        Log.d("TEST","---------------------------------------------");
-
-        container = (CardView)itemView.findViewById(R.id.beacon_card);
+        container = (CardView)itemView;
         tittleView = (TextView)itemView.findViewById(R.id.beacon_name);
         descriptionView = (TextView)itemView.findViewById(R.id.beacon_description);
         typeIconView = (ImageView)itemView.findViewById(R.id.beacon_type_icon);

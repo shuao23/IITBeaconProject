@@ -49,6 +49,11 @@
             android:label="Nearby Beacons"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".activities.WebActivity"
+            android:label="IIT Website"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

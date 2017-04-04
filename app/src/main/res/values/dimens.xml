@@ -1,4 +1,6 @@
 <resources>
-    <dimen name="beacon_icon_size">25dp</dimen>
+    <dimen name="beacon_icon_size">20dp</dimen>
+    <dimen name="selected_marker_size">40dp</dimen>
     <dimen name="option_padding">15dp</dimen>
+    <dimen name="loading_size">50dp</dimen>
 </resources>
