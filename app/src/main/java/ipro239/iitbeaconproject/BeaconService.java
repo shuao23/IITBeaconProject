@@ -191,8 +191,10 @@ public class BeaconService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        beaconScanner.stopScan();
-        scannerHandler.removeCallbacksAndMessages(null);
-        connectedBeacons.clear();
+        if(beaconScanner != null) {
+            beaconScanner.stopScan();
+            scannerHandler.removeCallbacksAndMessages(null);
+            connectedBeacons.clear();
+        }
     }
 }
