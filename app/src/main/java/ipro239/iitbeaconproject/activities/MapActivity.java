@@ -49,6 +49,7 @@ import java.util.List;
 import ipro239.iitbeaconproject.activities.helper.BeaconViewHolder;
 import ipro239.iitbeaconproject.beacon.Beacon;
 import ipro239.iitbeaconproject.beacon.BeaconConnection;
+import ipro239.iitbeaconproject.beacon.BeaconDatabase;
 import ipro239.iitbeaconproject.beacon.BeaconDisplayer;
 import ipro239.iitbeaconproject.beacon.BeaconFilters;
 import ipro239.iitbeaconproject.beacon.BeaconIcons;
@@ -100,6 +101,10 @@ public class MapActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Initialize beacon database
+        if(!BeaconDatabase.isInit())
+            BeaconDatabase.init(this);
 
         if(!UserModeActivity.Initialized(this)){
             //Display the user mode screen if the app is used for the first time
@@ -346,7 +351,11 @@ public class MapActivity extends AppCompatActivity  {
 
         //Display all beacons from xml file
         beaconDisplayer = new BeaconDisplayer(this, mapView);
-        beaconDisplayer.addBeacons(getBeaconData());
+        if(BeaconDatabase.isInit()) {
+            for (int i = 0; i < BeaconDatabase.getBeaconCount(); i++) {
+                beaconDisplayer.addBeacon(BeaconDatabase.getBeacon(i));
+            }
+        }
         beaconDisplayer.setDisplayTag(getSharedPreferences(OptionsActivity.BEACON_PREF_NAME, MODE_PRIVATE)
                 .getInt(UserModeActivity.SELECTED_FLAG, BeaconFilters.ALL_FLAGS));
         beaconDisplayer.updateDisplay();
@@ -465,25 +474,6 @@ public class MapActivity extends AppCompatActivity  {
                 beaconDisplayer.changeBeaconState(connection.getId(), false);
             connection = connectionManager.popConnectionQueue();
         }
-    }
-
-    private List<Beacon> getBeaconData(){
-        //Display beacons
-        List<Beacon> result;
-        InputStream inputStream = getResources().openRawResource(R.raw.beacons);
-        BeaconXMLParser parser = new BeaconXMLParser();
-        try {
-            try {
-                result = parser.parse(inputStream);
-
-            }finally {
-                inputStream.close();
-            }
-        }catch (Exception e){
-            result = null;
-            Toast.makeText(this, "Could not load beacons", Toast.LENGTH_LONG).show();
-        }
-        return result;
     }
 
     private void showSelectedBeaconCard(){
