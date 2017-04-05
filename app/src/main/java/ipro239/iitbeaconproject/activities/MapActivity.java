@@ -1,6 +1,8 @@
 package ipro239.iitbeaconproject.activities;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.ScanSettings;
@@ -9,13 +11,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Region;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +44,9 @@ import com.qozix.tileview.TileView;
 import com.qozix.tileview.hotspots.HotSpot;
 import com.qozix.tileview.markers.MarkerLayout;
 import com.qozix.tileview.widgets.ZoomPanLayout;
+
+import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.MonitorNotifier;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -75,6 +83,7 @@ public class MapActivity extends AppCompatActivity  {
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
     private static final int NEXT_SCAN_DELAY = 20000;
+    private static final NotificationManager beaconManager;
 
     private TileView mapView;
     private View uiView;
@@ -516,24 +525,24 @@ public class MapActivity extends AppCompatActivity  {
         });
         cardView.startAnimation(topUp);
     }
-}
 
 
-    /*@Override
+    @Override
     public void onBeaconServiceConnect() {
+        private int NOTIFICATION_ID=0;
         Identifier uuid = Identifier.parse("");
         Region testRegion = new Region("test_region", null, null, null);
         beaconManager.addMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
-                Uri webpage=Uri.parse("http://www.google.com");
+                Uri webpage= Uri.parse("http://www.google.com");
                 Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
                 //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
                 PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                         intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.drawable.ic_b_active)
+                                .setSmallIcon(R.drawable.beaconNotification)
                                 .setContentTitle("IIT Beacon")
                                 .setContentText("Find beacon nearby")
                                 .setContentIntent(pi);
@@ -556,4 +565,6 @@ public class MapActivity extends AppCompatActivity  {
             beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
         }
         catch (RemoteException e) {    }
-    }*/
+    }
+
+}
