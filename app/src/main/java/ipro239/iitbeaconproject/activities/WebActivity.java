@@ -19,6 +19,7 @@ import ipro239.iitbeaconproject.R;
 
 public class WebActivity extends AppCompatActivity {
 
+    public static final String TITTLE_KEY = "tittleKey";
     public static final String URL_KEY = "urlKey";
 
     @Override
@@ -39,6 +40,7 @@ public class WebActivity extends AppCompatActivity {
                         FrameLayout.LayoutParams.MATCH_PARENT));
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(getIntent().getExtras().getString(URL_KEY));
+        setTitle(getIntent().getExtras().getString("", "IIT Website"));
         frameLayout.addView(webView);
 
         final ProgressBar progressBar = new ProgressBar(this);

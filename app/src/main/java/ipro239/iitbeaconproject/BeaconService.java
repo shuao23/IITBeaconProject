@@ -40,9 +40,10 @@ import ipro239.iitbeaconproject.bluetooth.BeaconScanner;
 
 public class BeaconService extends Service {
 
+    public static final String ENABLE_KEY = "enable";
     private static final int NOTIFICATION_ID = 113;
     private static final int SCAN_LENGTH = 1000; //Scan for 1 seconds
-    private static final int SCAN_PERIOD = 5000; //Wait for 5 seconds
+    private static final int SCAN_PERIOD = 7000; //Wait for 7 seconds
     private static final int MINIMUM_NOTIFICATION_TIME = 900000; //900sec or 15 minutes
 
     private BeaconScanner beaconScanner;
@@ -51,6 +52,7 @@ public class BeaconService extends Service {
 
     @Override
     public void onCreate() {
+        Log.d("Test", "Create");
         if(!BeaconDatabase.isInit())
             BeaconDatabase.init(this);
 
@@ -126,6 +128,7 @@ public class BeaconService extends Service {
                         || System.currentTimeMillis() - connectedBeacons.get(result.getInstanceID()) > MINIMUM_NOTIFICATION_TIME){
                     Intent intent = new Intent(BeaconService.this, WebActivity.class);
                     intent.putExtra(WebActivity.URL_KEY, beacon.getUrl());
+                    intent.putExtra(WebActivity.URL_KEY, beacon.getName());
                     PendingIntent pendingIntent = PendingIntent.getActivity(BeaconService.this, 0, intent, 0);
                     Notification.Builder notiBuilder = new Notification.Builder(BeaconService.this);
                     notiBuilder
@@ -162,13 +165,26 @@ public class BeaconService extends Service {
     }
 
     private void  startBackgroundTask(Intent intent, int startId) {
-        scannerHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                beaconScanner.startScan(SCAN_LENGTH);
-                scannerHandler.postDelayed(this, SCAN_PERIOD);
+        if(intent == null  || intent.getExtras() == null || intent.getExtras().getBoolean(ENABLE_KEY, true)) {
+            scannerHandler.removeCallbacksAndMessages(null);
+            scannerHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (beaconScanner != null) {
+                        Log.d("TEST", connectedBeacons.size() + "");
+                        beaconScanner.startScan(SCAN_LENGTH);
+                        scannerHandler.postDelayed(this, SCAN_PERIOD);
+                    } else {
+                        stopSelf();
+                    }
+                }
+            });
+        }else {
+            if(beaconScanner != null) {
+                beaconScanner.stopScan();
+                scannerHandler.removeCallbacksAndMessages(null);
             }
-        });
+        }
     }
 
     @Override
@@ -177,5 +193,6 @@ public class BeaconService extends Service {
 
         beaconScanner.stopScan();
         scannerHandler.removeCallbacksAndMessages(null);
+        connectedBeacons.clear();
     }
 }

@@ -11,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import ipro239.iitbeaconproject.BeaconService;
 import ipro239.iitbeaconproject.R;
 
 /**
@@ -21,6 +22,7 @@ public class OptionsActivity extends AppCompatActivity {
 
     public static final String BEACON_PREF_NAME = "BeaconPref";
     public static final String BACKGROUND_SCANNING_KEY = "background scanning";
+    public static final String NOTIFICATION_KEY = "NOTIFICATION_KEY";
 
     private SharedPreferences preferences;
 
@@ -43,6 +45,23 @@ public class OptionsActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean(BACKGROUND_SCANNING_KEY, isChecked);
                 editor.apply();
+            }
+        });
+
+        aSwitch = (Switch)findViewById(R.id.ui_notification);
+        aSwitch.setChecked(preferences.getBoolean(NOTIFICATION_KEY, false));
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(NOTIFICATION_KEY, isChecked);
+                editor.apply();
+
+                //Start service
+                if(isChecked)
+                    startService(new Intent(OptionsActivity.this, BeaconService.class));
+                else
+                    stopService(new Intent(OptionsActivity.this, BeaconService.class));
             }
         });
     }

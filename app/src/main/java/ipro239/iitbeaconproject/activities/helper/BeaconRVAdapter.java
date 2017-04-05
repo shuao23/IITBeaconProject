@@ -43,9 +43,9 @@ public class BeaconRVAdapter extends RecyclerView.Adapter<BeaconViewHolder> {
         holder.getContainer().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = beacons.get(position).getUrl();
                 Intent intent = new Intent(v.getContext(), WebActivity.class);
-                intent.putExtra(WebActivity.URL_KEY, url);
+                intent.putExtra(WebActivity.URL_KEY, beacons.get(position).getUrl());
+                intent.putExtra(WebActivity.TITTLE_KEY, beacons.get(position).getName());
                 v.getContext().startActivity(intent);
             }
         });

@@ -26,7 +26,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +47,6 @@ import com.qozix.tileview.widgets.ZoomPanLayout;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -63,7 +61,6 @@ import ipro239.iitbeaconproject.beacon.BeaconDatabase;
 import ipro239.iitbeaconproject.beacon.BeaconDisplayer;
 import ipro239.iitbeaconproject.beacon.BeaconFilters;
 import ipro239.iitbeaconproject.beacon.BeaconIcons;
-import ipro239.iitbeaconproject.beacon.BeaconXMLParser;
 import ipro239.iitbeaconproject.beacon.ConnectionStatus;
 import ipro239.iitbeaconproject.bluetooth.BLEScanCallback;
 import ipro239.iitbeaconproject.bluetooth.BeaconScanResult;
@@ -83,7 +80,6 @@ public class MapActivity extends AppCompatActivity  {
     private static final int SCAN_LENGTH = 2500;
     private static final int MARKER_UPDATE_WAIT = 500;
     private static final int NEXT_SCAN_DELAY = 20000;
-    private static final NotificationManager beaconManager;
 
     private TileView mapView;
     private View uiView;
@@ -130,9 +126,6 @@ public class MapActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
 
-        //Stop background scanning service
-        stopService(new Intent(this, BeaconService.class));
-
         SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
 
         //Get the flag settings
@@ -160,9 +153,6 @@ public class MapActivity extends AppCompatActivity  {
         //Stop auto scans
         autoScannerHandler.removeCallbacksAndMessages(null);
         stopScan();
-
-        //Start service
-        startService(new Intent(this, BeaconService.class));
 
         super.onPause();
     }
@@ -420,6 +410,7 @@ public class MapActivity extends AppCompatActivity  {
                         public void onClick(View v) {
                             Intent intent = new Intent(MapActivity.this, WebActivity.class);
                             intent.putExtra(WebActivity.URL_KEY, beacon.getUrl());
+                            intent.putExtra(WebActivity.TITTLE_KEY, beacon.getName());
                             v.getContext().startActivity(intent);
                         }
                     });
@@ -524,47 +515,6 @@ public class MapActivity extends AppCompatActivity  {
             }
         });
         cardView.startAnimation(topUp);
-    }
-
-
-    @Override
-    public void onBeaconServiceConnect() {
-        private int NOTIFICATION_ID=0;
-        Identifier uuid = Identifier.parse("");
-        Region testRegion = new Region("test_region", null, null, null);
-        beaconManager.addMonitorNotifier(new MonitorNotifier() {
-            @Override
-            public void didEnterRegion(Region region) {
-                Uri webpage= Uri.parse("http://www.google.com");
-                Intent intent=new Intent(Intent.ACTION_VIEW,webpage);
-                //Intent launchIntent = new Intent(getApplicationContext(), MapActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                        intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.drawable.beaconNotification)
-                                .setContentTitle("IIT Beacon")
-                                .setContentText("Find beacon nearby")
-                                .setContentIntent(pi);
-
-                NotificationManager notificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            }
-
-            @Override
-            public void didExitRegion(Region region) {
-
-            }
-
-            @Override
-            public void didDetermineStateForRegion(int i, Region region) {
-            }
-        });
-        try {
-            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
-        }
-        catch (RemoteException e) {    }
     }
 
 }
