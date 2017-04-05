@@ -44,8 +44,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
+import ipro239.iitbeaconproject.BeaconService;
 import ipro239.iitbeaconproject.activities.helper.BeaconViewHolder;
 import ipro239.iitbeaconproject.beacon.Beacon;
 import ipro239.iitbeaconproject.beacon.BeaconConnection;
@@ -119,6 +121,9 @@ public class MapActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
 
+        //Stop background scanning service
+        stopService(new Intent(this, BeaconService.class));
+
         SharedPreferences preferences  = getSharedPreferences(OptionsActivity.BEACON_PREF_NAME,MODE_PRIVATE);
 
         //Get the flag settings
@@ -146,6 +151,9 @@ public class MapActivity extends AppCompatActivity  {
         //Stop auto scans
         autoScannerHandler.removeCallbacksAndMessages(null);
         stopScan();
+
+        //Start service
+        startService(new Intent(this, BeaconService.class));
 
         super.onPause();
     }
@@ -352,8 +360,9 @@ public class MapActivity extends AppCompatActivity  {
         //Display all beacons from xml file
         beaconDisplayer = new BeaconDisplayer(this, mapView);
         if(BeaconDatabase.isInit()) {
-            for (int i = 0; i < BeaconDatabase.getBeaconCount(); i++) {
-                beaconDisplayer.addBeacon(BeaconDatabase.getBeacon(i));
+            Iterator<Beacon> iterator = BeaconDatabase.getBeaconIter();
+            while (iterator.hasNext()){
+                beaconDisplayer.addBeacon(iterator.next());
             }
         }
         beaconDisplayer.setDisplayTag(getSharedPreferences(OptionsActivity.BEACON_PREF_NAME, MODE_PRIVATE)

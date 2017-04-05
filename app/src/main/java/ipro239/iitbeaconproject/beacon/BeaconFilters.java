@@ -55,7 +55,7 @@ public class BeaconFilters {
     }
 
     public boolean doesFlagOverlap(int flag){
-        return (flag & this.flag) != 0;
+        return (flag == 0 || (flag & this.flag) != 0);
     }
 
     public boolean allFlagCleared(){
