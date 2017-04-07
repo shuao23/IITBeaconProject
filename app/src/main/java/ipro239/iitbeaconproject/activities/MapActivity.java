@@ -108,7 +108,7 @@ public class MapActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        stopService(new Intent(this,BeaconService.class));
         //Initialize beacon database
         if(!BeaconDatabase.isInit())
             BeaconDatabase.init(this);
@@ -153,8 +153,13 @@ public class MapActivity extends AppCompatActivity  {
         //Stop auto scans
         autoScannerHandler.removeCallbacksAndMessages(null);
         stopScan();
-        startService(new Intent(this, BeaconService.class));
         super.onPause();
+    }
+
+    @Override
+    protected void onStop(){
+        startService(new Intent(this, BeaconService.class));
+        super.onStop();
     }
 
     @Override
