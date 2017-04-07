@@ -153,7 +153,7 @@ public class MapActivity extends AppCompatActivity  {
         //Stop auto scans
         autoScannerHandler.removeCallbacksAndMessages(null);
         stopScan();
-
+        startService(new Intent(this, BeaconService.class));
         super.onPause();
     }
 

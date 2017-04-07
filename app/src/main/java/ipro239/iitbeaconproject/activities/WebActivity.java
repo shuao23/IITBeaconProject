@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.webkit.WebChromeClient;
@@ -40,7 +41,8 @@ public class WebActivity extends AppCompatActivity {
                         FrameLayout.LayoutParams.MATCH_PARENT));
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(getIntent().getExtras().getString(URL_KEY));
-        setTitle(getIntent().getExtras().getString("", "IIT Website"));
+        Log.d("tag",getIntent().getExtras().getString(WebActivity.TITTLE_KEY,"IIT Website"));
+        setTitle(getIntent().getExtras().getString(WebActivity.TITTLE_KEY,"IIT Website"));
         frameLayout.addView(webView);
 
         final ProgressBar progressBar = new ProgressBar(this);

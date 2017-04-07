@@ -109,7 +109,7 @@ public class BeaconService extends Service {
             return false;
 
         beaconScanner = new BeaconScanner(bluetoothAdapter);
-        beaconScanner.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
+        beaconScanner.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
         beaconScanner.setBLEScanCallbackListener(new BLEScanCallback() {
 
             @Override
@@ -127,9 +127,10 @@ public class BeaconService extends Service {
                 if(!connectedBeacons.containsKey(result.getInstanceID())
                         || System.currentTimeMillis() - connectedBeacons.get(result.getInstanceID()) > MINIMUM_NOTIFICATION_TIME){
                     Intent intent = new Intent(BeaconService.this, WebActivity.class);
+                    Log.d("tag","url: "+beacon.getUrl());
                     intent.putExtra(WebActivity.URL_KEY, beacon.getUrl());
-                    intent.putExtra(WebActivity.URL_KEY, beacon.getName());
-                    PendingIntent pendingIntent = PendingIntent.getActivity(BeaconService.this, 0, intent, 0);
+                    intent.putExtra(WebActivity.TITTLE_KEY, beacon.getName());
+                    PendingIntent pendingIntent = PendingIntent.getActivity(BeaconService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
                     Notification.Builder notiBuilder = new Notification.Builder(BeaconService.this);
                     notiBuilder
                             .setContentTitle("IIT Beacon")
