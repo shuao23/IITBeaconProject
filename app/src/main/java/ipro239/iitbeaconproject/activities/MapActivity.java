@@ -158,7 +158,8 @@ public class MapActivity extends AppCompatActivity  {
 
     @Override
     protected void onStop(){
-        startService(new Intent(this, BeaconService.class));
+        if(getSharedPreferences(OptionsActivity.BEACON_PREF_NAME, MODE_PRIVATE).getBoolean(OptionsActivity.NOTIFICATION_KEY, false))
+            startService(new Intent(this, BeaconService.class));
         super.onStop();
     }
 

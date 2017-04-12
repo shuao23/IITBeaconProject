@@ -68,6 +68,10 @@ public class BeaconScanner {
         return scanMode;
     }
 
+    public boolean isScannable(){
+        return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void startScan(int scanLength){
         if(bluetoothAdapter == null)

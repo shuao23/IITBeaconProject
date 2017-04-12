@@ -171,11 +171,14 @@ public class BeaconService extends Service {
             scannerHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (beaconScanner != null) {
-                        Log.d("TEST", connectedBeacons.size() + "");
+                    if (beaconScanner != null && beaconScanner.isScannable()) {
                         beaconScanner.startScan(SCAN_LENGTH);
                         scannerHandler.postDelayed(this, SCAN_PERIOD);
                     } else {
+                        if(beaconScanner != null)
+                            beaconScanner.stopScan();
+                        scannerHandler.removeCallbacksAndMessages(null);
+                        connectedBeacons.clear();
                         stopSelf();
                     }
                 }
