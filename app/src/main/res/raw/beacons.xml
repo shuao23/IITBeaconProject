@@ -7,8 +7,8 @@
         <description>Hungry? Talon's got you!</description>
         <url>http://iitbeacon.simplesite.com/433600964</url>
         <location>
-            <x>1634</x>
-            <y>6157</y>
+            <x>1100</x>
+            <y>6900</y>
         </location>
     </beacon>
     <beacon>
@@ -18,8 +18,8 @@
         <description>A fun place located in the basement</description>
         <url>http://iitbeacon.simplesite.com/433454290</url>
         <location>
-            <x>1749</x>
-            <y>5915</y>
+            <x>1150</x>
+            <y>6850</y>
         </location>
     </beacon>
     <beacon>
@@ -29,8 +29,8 @@
         <description>Need a job? These are the people to ask!</description>
         <url>http://iitbeacon.simplesite.com/433454292</url>
         <location>
-            <x>1487</x>
-            <y>5783</y>
+            <x>1270</x>
+            <y>6100</y>
         </location>
     </beacon>
     <beacon>
@@ -40,8 +40,8 @@
         <description>Struggling in class? The ARC is free and available to help!</description>
         <url>http://iitbeacon.simplesite.com/433454294</url>
         <location>
-            <x>1438</x>
-            <y>5305</y>
+            <x>800</x>
+            <y>6130</y>
         </location>
     </beacon>
     <beacon>
@@ -51,8 +51,8 @@
         <description>Welcome to Herman Hall</description>
         <url>http://iitbeacon.simplesite.com/433488275</url>
         <location>
-            <x>1850</x>
-            <y>5412</y>
+            <x>775</x>
+            <y>6825</y>
         </location>
     </beacon>
     <beacon>
@@ -62,8 +62,8 @@
         <description>Welcome to Herman Hall</description>
         <url>http://iitbeacon.simplesite.com/433488275</url>
         <location>
-            <x>1850</x>
-            <y>6059</y>
+            <x>1300</x>
+            <y>6825</y>
         </location>
     </beacon>
 
