@@ -71,8 +71,8 @@ import ipro239.iitbeaconproject.bluetooth.BeaconScanner;
 public class MapActivity extends AppCompatActivity  {
 
     //Statics
-    private static final int MAP_SIZEX = 6823;
-    private static final int MAP_SIZEY = 13866;
+    private static final int MAP_SIZEX = 5749;
+    private static final int MAP_SIZEY = 12834;
     private static final int REQUEST_PERMISSION = 273;
     private static final int REQUEST_ENABLE_BT = 842;
     private static final int REQUEST_ENABLE_LOC = 555;
@@ -324,6 +324,7 @@ public class MapActivity extends AppCompatActivity  {
     private void setupView(){
         //Create the base layout
         FrameLayout baseLayout = new FrameLayout(this);
+        baseLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.backgroundColor));
         //Create the map view
         TileView tileView = createMap();
         baseLayout.addView(tileView);
@@ -429,13 +430,12 @@ public class MapActivity extends AppCompatActivity  {
     private TileView createMap(){
         TileView tileView = new TileView(this);
         tileView.setSize(MAP_SIZEX,MAP_SIZEY);
-        tileView.addDetailLevel(1f, "map_org_sliced/map_org_tile-%d_%d.png", 256, 256);
-        tileView.addDetailLevel(0.69998534369f, "map_70_sliced/map70_tile-%d_%d.png", 256, 256);
-        tileView.addDetailLevel(0.39997068738f, "map_40_sliced/map40_tile-%d_%d.png", 256, 256);
-        tileView.addDetailLevel(0.0999560311f, "map_10_sliced/map10_tile-%d_%d.png", 256, 256);
+        tileView.addDetailLevel(1f, "sliced_large/large_tile-%d_%d.png", 256, 256);
+        tileView.addDetailLevel(0.6f, "sliced_medium/medium_tile-%d_%d.png", 256, 256);
+        tileView.addDetailLevel(0.2f, "sliced_small/small_tile-%d_%d.png", 256, 256);
 
         ImageView downSample = new ImageView(this);
-        downSample.setImageResource( R.drawable.map_tiny );
+        downSample.setImageResource( R.drawable.tiny );
         tileView.addView( downSample, 0 );
 
         tileView.setScale(0);
