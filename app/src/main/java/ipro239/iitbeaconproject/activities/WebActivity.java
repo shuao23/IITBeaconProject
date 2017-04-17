@@ -41,7 +41,6 @@ public class WebActivity extends AppCompatActivity {
                         FrameLayout.LayoutParams.MATCH_PARENT));
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(getIntent().getExtras().getString(URL_KEY));
-        Log.d("tag",getIntent().getExtras().getString(WebActivity.TITTLE_KEY,"IIT Website"));
         setTitle(getIntent().getExtras().getString(WebActivity.TITTLE_KEY,"IIT Website"));
         frameLayout.addView(webView);
 
